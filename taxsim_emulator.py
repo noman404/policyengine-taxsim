@@ -4,9 +4,13 @@ from policyengine_us.model_api import *
 
 import pandas as pd
 
+from Sim import Sim
+
+import os
+
 # Example simulation imported from policyengine.org
 # Single 40 year old parent with $100,000 income, 2 kids (10 years old), living in CA
-situation = {
+situation1 = {
   "people": {
     "you": {
       "age": {
@@ -97,9 +101,82 @@ situation = {
   }
 }
 
-simulation = Simulation(
-    situation=situation,
-)
+situation2 = {
+  "people": {
+    "you": {
+      "age": {
+        "2024": 40
+      },
+      "employment_income": {
+        "2024": 100000
+      }
+    },
+    "your partner": {
+      "age": {
+        "2024": 40
+      },
+      "employment_income": {
+        "2024": 50000
+      }
+    }
+  },
+  "families": {
+    "your family": {
+      "members": [
+        "you",
+        "your partner"
+      ]
+    }
+  },
+  "marital_units": {
+    "your marital unit": {
+      "members": [
+        "you",
+        "your partner"
+      ]
+    }
+  },
+  "tax_units": {
+    "your tax unit": {
+      "members": [
+        "you",
+        "your partner"
+      ]
+    }
+  },
+  "spm_units": {
+    "your household": {
+      "members": [
+        "you",
+        "your partner"
+      ]
+    }
+  },
+  "households": {
+    "your household": {
+      "members": [
+        "you",
+        "your partner"
+      ],
+      "state_name": {
+        "2024": "AL"
+      }
+    }
+  }
+}
+
+    
+    
+list_of_households = [situation1, situation2]
+
+# input a list of situations and convert each situation into a simulation object
+def make_simulation(list_of_households):
+    list_of_simulations = []
+    for situation in list_of_households:
+        list_of_simulations.append(Simulation(situation = situation,))
+    return(list_of_simulations)
+
+list_of_simulations = make_simulation(list_of_households)
 
 # Return true if the string is a date
 def is_date(string):
@@ -132,9 +209,6 @@ def get_year(situation):
         for string in item:
             if is_date(string):
                 return(string)
-
-#print(get_year(situation))
-#print(get_state(situation))
 
 # Returns the itemized_deduction function for the user's state
 def state_itemized_deductions(situation):
@@ -172,13 +246,143 @@ def state_exemptions(situation):
     #try to calculate state_exemption, if error, return 0 --> NEED TO ADD Feature
     return(state + "_exemptions")
 
+def state_agi(situation):
+    state = get_state(situation).lower()
+    return(state + "_agi")
+
+def placeholder():
+    return("placeholder")
+
+# List of variables that aren't mapped in Policy Engine
+placeholder_variables = ["fica", "frate", "srate", "ficar", "tfica","exemption_phaseout","deduction_phaseout",
+                         "income_tax19","exemption_surtax","general_tax_credit","FICA","state_rent_expense",
+                         "state_property_tax_credit","state_eic","state_total_credits","state_bracket_rate", "state_exemptions", "state_cdcc"]
+
 
 # list of variables that match Taxsim output variables
-variables =  ["household_net_income", "employee_payroll_tax", "taxsim_tfica", "employee_medicare_tax", "eitc"]
+variables = ["get_year","get_state","income_tax","state_income_tax","fica", "frate", "srate", "ficar","tfica",
+             "adjusted_gross_income","tax_unit_taxable_unemployment_compensation","tax_unit_taxable_social_security",
+             "basic_standard_deduction","exemptions","exemption_phaseout","deduction_phaseout","taxable_income_deductions",
+             "taxable_income","income_tax19","exemption_surtax","general_tax_credit","ctc","refundable_ctc","cdcc",
+             "eitc", "amt_income","alternative_minimum_tax","income_tax_before_refundable_credits","FICA","household_net_income",
+             "state_rent_expense","state_agi","state_exemptions","state_standard_deduction","state_itemized_deductions",
+             "state_taxable_income","state_property_tax_credit","state_child_care_credit","state_eic","state_total_credits",
+             "state_bracket_rate","self_employment_income","net_investment_income_tax","employee_medicare_tax","rrc_cares"]
+
+
+# list of dictiionaries where each Policy Engine variable is mapped to the Taxsim name.
+# Booleans indicate whether the variable is a placeholder, a local variable, or a local variable that doesn't return a function (only get_year and state)
+# list of variables mapped to taxsim "2" input (full variables)
+full_variables = [
+    {'variable': 'get_year', 'taxsim_name': 'year', 'is_placeholder': False, 'is_local': True, 'is_local_getter': True},
+    {'variable': 'get_state', 'taxsim_name': 'state', 'is_placeholder': False, 'is_local': True, 'is_local_getter': True},
+    {'variable': 'income_tax', 'taxsim_name': 'fiitax', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_income_tax', 'taxsim_name': 'siitax', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'fica', 'taxsim_name': 'fica', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'frate', 'taxsim_name': 'frate', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'srate', 'taxsim_name': 'srate', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'ficar', 'taxsim_name': 'ficar', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'tfica', 'taxsim_name': 'tfica', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'adjusted_gross_income', 'taxsim_name': 'v10', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'tax_unit_taxable_unemployment_compensation', 'taxsim_name': 'v11', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'tax_unit_taxable_social_security', 'taxsim_name': 'v12', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'basic_standard_deduction', 'taxsim_name': 'v13', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'exemptions', 'taxsim_name': 'v14', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'exemption_phaseout', 'taxsim_name': 'v15', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'deduction_phaseout', 'taxsim_name': 'v16', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'taxable_income_deductions', 'taxsim_name': 'v17', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'taxable_income', 'taxsim_name': 'v18', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'income_tax19', 'taxsim_name': 'v19', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'exemption_surtax', 'taxsim_name': 'v20', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'general_tax_credit', 'taxsim_name': 'v21', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'ctc', 'taxsim_name': 'v22', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'refundable_ctc', 'taxsim_name': 'v23', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'cdcc', 'taxsim_name': 'v24', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'eitc', 'taxsim_name': 'v25', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'amt_income', 'taxsim_name': 'v26', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'alternative_minimum_tax', 'taxsim_name': 'v27', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'income_tax_before_refundable_credits', 'taxsim_name': 'v28', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'FICA', 'taxsim_name': 'v29', 'is_placeholder': True, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'household_net_income', 'taxsim_name': 'v30', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_rent_expense', 'taxsim_name': 'v31', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_agi', 'taxsim_name': 'v32', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_exemptions', 'taxsim_name': 'v33', 'is_placeholder': True, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_standard_deduction', 'taxsim_name': 'v34', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_itemized_deductions', 'taxsim_name': 'v35', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_taxable_income', 'taxsim_name': 'v36', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_property_tax_credit', 'taxsim_name': 'v37', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_child_care_credit', 'taxsim_name': 'v38', 'is_placeholder': True, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'state_eic', 'taxsim_name': 'v39', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_total_credits', 'taxsim_name': 'v40', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_bracket_rate', 'taxsim_name': 'v41', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'self_employment_income', 'taxsim_name': 'v42', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'net_investment_income_tax', 'taxsim_name': 'v43', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'employee_medicare_tax', 'taxsim_name': 'v44', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'rrc_cares', 'taxsim_name': 'v45', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False}
+]
+
+# variables mapped to taxsim "0" input (standard)
+standard_variables = [
+    {'variable': 'get_year', 'taxsim_name': 'year', 'is_placeholder': False, 'is_local': True, 'is_local_getter': True},
+    {'variable': 'get_state', 'taxsim_name': 'state', 'is_placeholder': False, 'is_local': True, 'is_local_getter': True},
+    {'variable': 'income_tax', 'taxsim_name': 'fiitax', 'is_placeholder': False, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'state_income_tax', 'taxsim_name': 'siitax', 'is_placeholder': False, 'is_local': True, 'is_local_getter': False},
+    {'variable': 'fica', 'taxsim_name': 'fica', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'frate', 'taxsim_name': 'frate', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'srate', 'taxsim_name': 'srate', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'ficar', 'taxsim_name': 'ficar', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+    {'variable': 'tfica', 'taxsim_name': 'tfica', 'is_placeholder': True, 'is_local': False, 'is_local_getter': False},
+]
 
 # Calculate the variables based on the user's information and save them to a dataframe
-output = simulation.calculate_dataframe(variables, 2024)
-output = pd.DataFrame(output)
 
-#output.to_csv()
-#print(output.head())
+# input a list of simulations, a list of households, and a variable_dict. 
+# variable dict will be switched to either 0, 2, 5 to correspond with taxsim inputs --> to be implemented
+# based on the value of variable_dict, a switch case will make correct output
+
+
+# seperate iteration into one single household output
+# second function that calls the single household for each in the list
+def make_dataframe(list_of_simulations, list_of_households, variable_dict):
+    output = []
+
+    for simulation, household in zip(list_of_simulations, list_of_households):
+        row = []
+        
+        for variable_info in variable_dict:
+            variable = variable_info['variable']
+            taxsim_name = variable_info['taxsim_name']
+            is_placeholder = variable_info['is_placeholder']
+            is_local = variable_info['is_local']
+            is_local_getter = variable_info["is_local_getter"]
+            
+            # if the variable is a placeholder, append "placeholder"
+            if is_placeholder:
+                row.append(placeholder())
+            else:
+                # if the variable is local, return the value of the local function (returns a  to policyenginge function name)
+                if is_local:
+                    function = globals()[variable]
+                    result = function(household)
+                    # if the variable is a local getter, just return the value of the local function
+                    if is_local_getter:
+                        calculation = result
+                    # otherwise, run policy engine calculation using the function name
+                    else:
+                      calculation = simulation.calculate(result)
+                # if the variable is not local, just run policy engine calculation
+                else:
+                    calculation = simulation.calculate(variable)
+                
+                row.append(calculation)
+        
+        output.append(row)
+    
+    # Create DataFrame from the output with taxsim_names as columns
+    df = pd.DataFrame(output, columns=[var['taxsim_name'] for var in variable_dict], index=pd.RangeIndex(start=1, stop=len(output)+1, name='taxsimid'))
+    
+    return df
+
+output = make_dataframe(list_of_simulations, list_of_households, full_variables)
+print(output)
+output.to_csv('output.csv', index=True)
