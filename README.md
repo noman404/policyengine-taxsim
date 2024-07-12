@@ -15,5 +15,29 @@ If the emulator and input file are in the current working directory, run:
 
 python3 taxsim_emulator.py taxsim_input.raw
 
+## List of working input variables ##
 
+### Demographics: ###
+1. taxsimid 
+2. year
+3. state
+4. mstat (only 1 (single) and 2 (joint) filing options work)
+5. page (age of primary taxpayer)
+6. sage (age of spouse)
+7. depx (number of dependents)
+8. age1 (age of first dependent)
+9. age2 (age of second dependent)
+10. age3 (age of third dependent)
 
+### Income: ###
+1. pwages (wage of primary taxpayer)
+2. swages (wage of spouse)
+3. psemp (self-employment income of primary taxpayer)
+4. ssemp (self-employment income of spouse)
+5. dividends (dividend income)
+6. intrec (taxable interest received)
+7. stcg (short-term capital gains)
+8. ltcg (long-term capital gains)
+9. pui (primary taxpayer unemployment compensation received)
+10. sui (spouse unemployment compensation received)
+11. proptax (real estate taxes paid)

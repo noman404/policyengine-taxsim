@@ -95,7 +95,7 @@ class InputReader:
         spouse_variables = ["swages","ssemp","sui"]
 
         primary_taxpayer = "you"
-        spouse_taxpayer = "your spouse"
+        spouse_taxpayer = "your partner"
 
         for taxsim_var, situation_var in income_variable_map.items():
             value = row.get(taxsim_var, None)
@@ -142,17 +142,18 @@ class InputReader:
             4: "fourth",
             5: "fifth"
         }
-
-        for i in range(1, depx + 1):
+        # taxsim limits the number of dependents at 3.
+        for i in range(1, min(depx, 3) + 1):
             dependent_id = ordinal.get(i)
+            dependent_name = "your " + dependent_id + " dependent"
             dependent_age = int(row.get(f'age{i}', 10))
-            situation["people"][dependent_id] = {
+            situation["people"][dependent_name] = {
                 "age": { year: dependent_age },
             }
-            situation["families"]["your family"]["members"].append(dependent_id)
-            situation["spm_units"]["your household"]["members"].append(dependent_id)
-            situation["households"]["your household"]["members"].append(dependent_id)
-            situation["tax_units"]["your tax unit"]["members"].append(dependent_id)
+            situation["families"]["your family"]["members"].append(dependent_name)
+            situation["spm_units"]["your household"]["members"].append(dependent_name)
+            situation["households"]["your household"]["members"].append(dependent_name)
+            situation["tax_units"]["your tax unit"]["members"].append(dependent_name)
 
     # create the situation 
     def create_situation(self, row):
