@@ -174,7 +174,32 @@ def get_fica(situation):
     employee_medicare_tax = simulation.calculate(variable_name="employee_medicare_tax")
     additional_medicare_tax = simulation.calculate(variable_name="additional_medicare_tax")
     return employee_social_security_tax + employee_medicare_tax + additional_medicare_tax
-    # return convert_to_number(employee_social_security_tax)
+
+
+def get_mtr(household, mtr_type, _simulation):
+    simulation = Simulation(situation=household)
+    simulation_with_earnings_rise = Simulation(situation=household)
+    year = get_year(household)
+
+    earnings = simulation_with_earnings_rise.calculate("employment_income", year)
+    new_earnings = earnings + 1
+    simulation_with_earnings_rise.set_input("employment_income", year, new_earnings)
+    fed_income_tax_original = simulation.calculate("income_tax", year)
+    fed_income_tax_after_rise = simulation_with_earnings_rise.calculate("income_tax", year)
+    income_tax_rise = fed_income_tax_after_rise - fed_income_tax_original
+    federal_mtr = income_tax_rise / 1
+
+    state_tax_original = simulation.calculate("state_income_tax", year)
+    state_tax_after_rise = simulation_with_earnings_rise.calculate("state_income_tax", year)
+    state_tax_rise = state_tax_after_rise - state_tax_original
+    state_mtr = state_tax_rise / 1
+
+    if mtr_type == "federal_mtr":
+        return np.array(federal_mtr * 100)
+    elif mtr_type == "state_mtr":
+        return np.array(state_mtr * 100)
+    else:
+        return np.array(0)
 
 
 # List of variables that aren't mapped in Policy Engine
@@ -210,8 +235,8 @@ full_variables = [
     {'taxsim_name': 'fiitax', 'calculation': 'income_tax'},
     {'taxsim_name': 'siitax', 'calculation': lambda household: globals()['state_income_tax'](household)},
     {'taxsim_name': 'fica', 'calculation': 'get_fica'},
-    {'taxsim_name': 'frate', 'calculation': 'placeholder'},
-    {'taxsim_name': 'srate', 'calculation': 'placeholder'},
+    {'taxsim_name': 'frate', 'calculation': 'federal_mtr'},
+    {'taxsim_name': 'srate', 'calculation': 'state_mtr'},
     {'taxsim_name': 'ficar', 'calculation': 'placeholder'},
     {'taxsim_name': 'tfica', 'calculation': 'taxsim_tfica'},
     {'taxsim_name': 'v10', 'calculation': 'adjusted_gross_income'},
@@ -295,6 +320,12 @@ def single_household(household, variable_dict):
                 # print(simulation.tracer.print_computation_log())
             elif calculation == 'get_fica':
                 result = get_fica(household)
+                result = convert_to_number(result)
+            elif calculation == 'federal_mtr':
+                result = get_mtr(household=household, mtr_type=calculation, _simulation=simulation)
+                result = convert_to_number(result)
+            elif calculation == 'state_mtr':
+                result = get_mtr(household=household, mtr_type=calculation, _simulation=simulation)
                 result = convert_to_number(result)
             elif calculation == 'child_care_credit':
                 result = child_care_credit(household)
