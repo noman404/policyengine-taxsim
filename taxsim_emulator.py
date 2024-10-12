@@ -15,15 +15,15 @@ import importlib.metadata
 
 def read_input_file(input_file):
     reader = InputReader(input_file)
-    return (reader)
+    return reader
 
 
 def get_situations(reader):
-    return (reader.situations)
+    return reader.situations
 
 
 def get_output_level(reader):
-    return (reader.output_level)
+    return reader.output_level
 
 
 def get_variables(output_level):
@@ -100,7 +100,7 @@ def get_state_code(situation):
         "OR": 38, "PA": 39, "RI": 40, "SC": 41, "SD": 42, "TN": 43, "TX": 44, "UT": 45, "VT": 46,
         "VA": 47, "WA": 48, "WV": 49, "WI": 50, "WY": 51
     }
-    return (state_code_mapping.get(state))
+    return state_code_mapping.get(state)
 
 
 # Returns the itemized_deduction function for the user's state
@@ -155,6 +155,28 @@ def placeholder(situation):
     return "placeholder"
 
 
+def property_tax_credit(situation):
+    state = get_state(situation).lower()
+    return state + "_property_tax_credit"
+
+
+def child_care_credit(situation):
+    state = get_state(situation).lower()
+    if state == 'me':
+        return state + '_child_care_credit'
+    else:
+        return 'placeholder'
+
+
+def get_fica(situation):
+    simulation = Simulation(situation=situation, )
+    employee_social_security_tax = simulation.calculate(variable_name="employee_social_security_tax")
+    employee_medicare_tax = simulation.calculate(variable_name="employee_medicare_tax")
+    additional_medicare_tax = simulation.calculate(variable_name="additional_medicare_tax")
+    return employee_social_security_tax + employee_medicare_tax + additional_medicare_tax
+    # return convert_to_number(employee_social_security_tax)
+
+
 # List of variables that aren't mapped in Policy Engine
 placeholder_variables = ["fica", "frate", "srate", "ficar", "tfica", "exemption_phaseout", "deduction_phaseout",
                          "income_tax19", "exemption_surtax", "general_tax_credit", "FICA", "state_rent_expense",
@@ -177,7 +199,7 @@ variables = ["get_year", "get_state", "income_tax", "state_income_tax", "fica", 
              "state_bracket_rate", "self_employment_income", "net_investment_income_tax", "employee_medicare_tax",
              "rrc_cares"]
 
-# list of dictiionaries where each Policy Engine variable is mapped to the Taxsim name.
+# list of dictionaries where each Policy Engine variable is mapped to the Taxsim name.
 # Booleans indicate whether the variable is a placeholder, a local variable, or a local variable that doesn't return a function (only get_year and state)
 # list of variables mapped to taxsim "2" input (full variables)
 
@@ -187,11 +209,11 @@ full_variables = [
     {'taxsim_name': 'state', 'calculation': 'get_state_code'},
     {'taxsim_name': 'fiitax', 'calculation': 'income_tax'},
     {'taxsim_name': 'siitax', 'calculation': lambda household: globals()['state_income_tax'](household)},
-    {'taxsim_name': 'fica', 'calculation': 'placeholder'},
+    {'taxsim_name': 'fica', 'calculation': 'get_fica'},
     {'taxsim_name': 'frate', 'calculation': 'placeholder'},
     {'taxsim_name': 'srate', 'calculation': 'placeholder'},
     {'taxsim_name': 'ficar', 'calculation': 'placeholder'},
-    {'taxsim_name': 'tfica', 'calculation': 'placeholder'},
+    {'taxsim_name': 'tfica', 'calculation': 'taxsim_tfica'},
     {'taxsim_name': 'v10', 'calculation': 'adjusted_gross_income'},
     {'taxsim_name': 'v11', 'calculation': 'tax_unit_taxable_unemployment_compensation'},
     {'taxsim_name': 'v12', 'calculation': 'tax_unit_taxable_social_security'},
@@ -201,7 +223,7 @@ full_variables = [
     {'taxsim_name': 'v16', 'calculation': 'placeholder'},
     {'taxsim_name': 'v17', 'calculation': 'taxable_income_deductions'},
     {'taxsim_name': 'v18', 'calculation': 'taxable_income'},
-    {'taxsim_name': 'v19', 'calculation': 'placeholder'},
+    {'taxsim_name': 'v19', 'calculation': 'income_tax'},
     {'taxsim_name': 'v20', 'calculation': 'placeholder'},
     {'taxsim_name': 'v21', 'calculation': 'placeholder'},
     {'taxsim_name': 'v22', 'calculation': 'ctc'},
@@ -219,8 +241,8 @@ full_variables = [
     {'taxsim_name': 'v34', 'calculation': lambda household: globals()['state_standard_deduction'](household)},
     {'taxsim_name': 'v35', 'calculation': lambda household: globals()['state_itemized_deductions'](household)},
     {'taxsim_name': 'v36', 'calculation': lambda household: globals()['state_taxable_income'](household)},
-    {'taxsim_name': 'v37', 'calculation': 'placeholder'},
-    {'taxsim_name': 'v38', 'calculation': 'placeholder'},
+    {'taxsim_name': 'v37', 'calculation': lambda household: globals()['property_tax_credit'](household)},
+    {'taxsim_name': 'v38', 'calculation': 'child_care_credit'},
     {'taxsim_name': 'v39', 'calculation': 'placeholder'},
     {'taxsim_name': 'v40', 'calculation': 'placeholder'},
     {'taxsim_name': 'v41', 'calculation': 'placeholder'},
@@ -245,7 +267,6 @@ standard_variables = [
 
 
 # Calculate the variables based on the user's information and save them to a dataframe
-
 # input a list of simulations, a list of households, and a variable_dict. 
 # variable dict will be switched to either 0, 2, 5 to correspond with taxsim inputs --> to be implemented
 
@@ -255,6 +276,8 @@ def single_household(household, variable_dict):
     row = []
 
     simulation = Simulation(situation=household, )
+    year = get_year(situation=household)
+    simulation.calculate('adjusted_gross_income', period=year)
 
     for variable_info in variable_dict:
         calculation = variable_info['calculation']
@@ -262,10 +285,25 @@ def single_household(household, variable_dict):
         if calculation in ['get_year', 'get_state_code', 'placeholder']:
             function = globals()[calculation]
             result = function(household)
-        # if calculation is a string, it is a policy engine function, so use the simulation to calculate
+        # if calculation field is a string, it is a policy engine function, so use the simulation to calculate
         elif isinstance(calculation, str):
-            result = simulation.calculate(calculation)
-            result = convert_to_number(result)
+            if calculation == 'adjusted_gross_income':
+                # simulation.trace = True
+                year = get_year(situation=household)
+                result = simulation.calculate(variable_name=calculation, period=year)
+                result = convert_to_number(result)
+                # print(simulation.tracer.print_computation_log())
+            elif calculation == 'get_fica':
+                result = get_fica(household)
+                result = convert_to_number(result)
+            elif calculation == 'child_care_credit':
+                result = child_care_credit(household)
+                if result != 'placeholder':
+                    result = simulation.calculate(calculation)
+                    result = convert_to_number(result)
+            else:
+                result = simulation.calculate(calculation)
+                result = convert_to_number(result)
         # if calculation is not a string, it is a local function that returns the name of a policy engine function
         # take the result of calculation, input it to the simulation.calculate, and assign the result to result
         else:
