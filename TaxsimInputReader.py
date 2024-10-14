@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 
 
-
 # TO DO: add data validation for each row. Need same number of data points in each row
 
 # class reads taxsim input and outputs a list of policy engine situations
@@ -37,14 +36,13 @@ class InputReader:
             47: "VA", 48: "WA", 49: "WV", 50: "WI", 51: "WY"
         }
         return state_mapping.get(state_number, "Invalid state number")
-    
 
     # Default situation from policy engine
     def create_default_situation(self, year):
         return {
             "people": {
                 "you": {
-                    "age": { year: 40 },
+                    "age": {year: 40},
                 },
             },
             "families": {
@@ -91,8 +89,8 @@ class InputReader:
             "proptax": "real_estate_taxes"
         }
 
-        primary_variables = ["pwages","psemp","dividends","intrec","stcg","ltcg","pui","proptax"]
-        spouse_variables = ["swages","ssemp","sui"]
+        primary_variables = ["pwages", "psemp", "dividends", "intrec", "stcg", "ltcg", "pui", "proptax"]
+        spouse_variables = ["swages", "ssemp", "sui"]
 
         primary_taxpayer = "you"
         spouse_taxpayer = "your partner"
@@ -107,20 +105,19 @@ class InputReader:
                 elif taxsim_var in spouse_variables:
                     if spouse_taxpayer not in situation["people"]:
                         situation["people"][spouse_taxpayer] = {
-                            "age": { year: 40 },  # Default age, should be updated from row if available
+                            "age": {year: 40},  # Default age, should be updated from row if available
                         }
                     situation["people"][spouse_taxpayer].setdefault(situation_var, {})[year] = value
                 else:
                     situation["people"][primary_taxpayer].setdefault(situation_var, {})[year] = value
 
-
     # add the spouse and their age/income to correct units in situation
     def add_spouse(self, situation, row, year):
         spouse_person_id = "your partner"
         situation["people"][spouse_person_id] = {
-            "age": { year: int(row.get('sage', 40)) },
-            "employment_income": { year: int(row.get('swages', 0)) },
-            "is_tax_unit_spouse": { year: True },
+            "age": {year: int(row.get('sage', 40))},
+            "employment_income": {year: int(row.get('swages', 0))},
+            "is_tax_unit_spouse": {year: True},
         }
         # Update units with spouse
         units_to_update = {
@@ -132,7 +129,7 @@ class InputReader:
         }
         for unit, unit_name in units_to_update.items():
             situation[unit][unit_name].setdefault("members", []).append(spouse_person_id)
-    
+
     # add dependents and their ages to the correct units
     def add_dependents(self, situation, row, year, depx):
         ordinal = {
@@ -148,7 +145,7 @@ class InputReader:
             dependent_name = "your " + dependent_id + " dependent"
             dependent_age = int(row.get(f'age{i}', 10))
             situation["people"][dependent_name] = {
-                "age": { year: dependent_age },
+                "age": {year: dependent_age},
             }
             situation["families"]["your family"]["members"].append(dependent_name)
             situation["spm_units"]["your household"]["members"].append(dependent_name)
@@ -163,7 +160,7 @@ class InputReader:
         depx_value = row.get('depx')
 
         if pd.notna(depx_value):
-            depx = int(depx_value) 
+            depx = int(depx_value)
         else:
             depx = 0
 
@@ -171,11 +168,11 @@ class InputReader:
 
         # Add primary taxpayer details
         main_person_id = "you"
-        situation["people"][main_person_id]["age"] = { year: int(row.get('page', 40)) }
-        situation["people"][main_person_id]["employment_income"] = { year: int(row.get('pwages', 0)) }
+        situation["people"][main_person_id]["age"] = {year: int(row.get('page', 40))}
+        situation["people"][main_person_id]["employment_income"] = {year: int(row.get('pwages', 0))}
 
         # Add state to the household
-        situation["households"]["your household"]["state_name"] = { year: state }
+        situation["households"]["your household"]["state_name"] = {year: state}
 
         if mstat == 2:
             self.add_spouse(situation, row, year)
@@ -188,7 +185,6 @@ class InputReader:
 
         return situation
 
-
     # return the output level based on input idtl value
     def get_output_level(self):
         idtl_values = self.df['idtl'].unique()
@@ -200,7 +196,7 @@ class InputReader:
             return "standard"
         else:
             raise ValueError("Unknown idtl value")
-    
+
     def get_situations(self):
         situations = []
         for index, row in self.df.iterrows():
@@ -208,8 +204,10 @@ class InputReader:
             situation = convert_to_int(situation)
             situations.append(situation)
         return situations
-    
+
     # Convert int64 and floats to int in the situation 
+
+
 def convert_to_int(obj):
     if isinstance(obj, np.int64):
         return int(obj)
@@ -218,9 +216,6 @@ def convert_to_int(obj):
     elif isinstance(obj, list):
         return [convert_to_int(element) for element in obj]
     elif isinstance(obj, float):
-        return(int(obj))
+        return int(obj)
     else:
         return obj
-    
-
-        
