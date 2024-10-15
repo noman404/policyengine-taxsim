@@ -6,11 +6,7 @@ import pandas as pd
 
 import argparse
 
-import os
-
 from TaxsimInputReader import InputReader
-
-import importlib.metadata
 
 
 def read_input_file(input_file):
@@ -261,7 +257,7 @@ full_variables = [
     {'taxsim_name': 'v29', 'calculation': 'placeholder'},
     {'taxsim_name': 'v30', 'calculation': 'household_net_income'},
     {'taxsim_name': 'v31', 'calculation': 'placeholder'},
-    {'taxsim_name': 'v32', 'calculation': lambda household: globals()['state_agi'](household)},
+    {'taxsim_name': 'v32', 'calculation': lambda household: globals()['state_agi'](household)},#this may not work for some of the states
     {'taxsim_name': 'v33', 'calculation': 'placeholder'},
     {'taxsim_name': 'v34', 'calculation': lambda household: globals()['state_standard_deduction'](household)},
     {'taxsim_name': 'v35', 'calculation': lambda household: globals()['state_itemized_deductions'](household)},
