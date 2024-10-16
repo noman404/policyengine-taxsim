@@ -326,16 +326,16 @@ def single_household(household, variable_dict):
             elif calculation == 'child_care_credit':
                 result = child_care_credit(household)
                 if result != 'placeholder':
-                    result = simulation.calculate(calculation)
+                    result = simulation.calculate(calculation, period=year)
                     result = convert_to_number(result)
             else:
-                result = simulation.calculate(calculation)
+                result = simulation.calculate(calculation, period=year)
                 result = convert_to_number(result)
         # if calculation is not a string, it is a local function that returns the name of a policy engine function
         # take the result of calculation, input it to the simulation.calculate, and assign the result to result
         else:
             func = calculation(household)
-            result = simulation.calculate(func)
+            result = simulation.calculate(func, period=year)
             result = convert_to_number(result)
 
         row.append(result)
