@@ -39,6 +39,9 @@ policyengine-taxsim = "policyengine_taxsim.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["policyengine_taxsim"]
 
+[tool.hatch.build.targets.wheel.shared-data]
+"resources/taxsim35" = "share/policyengine_taxsim/taxsim35"
+
 [tool.hatch.envs.default]
 dependencies = [
     "pytest",
