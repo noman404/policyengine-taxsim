@@ -28,12 +28,9 @@ jobs:
           pip install -e .
           pip install pytest
 
-      - name: Run tests
-        run: pytest tests/
-
       - name: Make TAXSIM executables executable (Unix)
         if: runner.os != 'Windows'
         run: chmod +x resources/taxsim35/taxsim35-*.exe
 
-      - name: Run E2E tests
-        run: pytest tests/test_e2e.py
+      - name: Run tests
+        run: pytest tests/
