@@ -1,0 +1,19 @@
+── policyengine_taxsim/
+│   ├── __init__.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── input_mapper.py
+│   │   ├── output_mapper.py
+│   │   └── utils.py
+│   ├── config/
+│   │   └── variable_mappings.yaml
+│   ├── tests/
+│   │   ├── __init__.py
+│   │   ├── test_input_mapper.py
+│   │   ├── test_output_mapper.py
+│   │   └── test_integration.py
+│   └── cli.py
+├── setup.py
+├── README.md
+├── requirements.txt
+└── .gitignore
