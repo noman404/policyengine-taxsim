@@ -16,14 +16,14 @@ def import_single_household(taxsim_vars):
     """
     mappings = load_variable_mappings()["taxsim_to_policyengine"]
 
-    year = str(taxsim_vars["year"])
+    year = str(int(taxsim_vars["year"]))  # Ensure year is an integer string
     state = get_state_code(taxsim_vars["state"])
 
     situation = {
         "people": {
             "you": {
-                "age": {year: taxsim_vars.get("page", 40)},
-                "employment_income": {year: taxsim_vars.get("pwages", 0)},
+                "age": {year: int(taxsim_vars.get("page", 40))},
+                "employment_income": {year: int(taxsim_vars.get("pwages", 0))},
             }
         },
         "households": {
