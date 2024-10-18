@@ -31,18 +31,6 @@ jobs:
       - name: Run tests
         run: pytest tests/
 
-      - name: Upload TAXSIM executables
-        uses: actions/upload-artifact@v2
-        with:
-          name: taxsim-executables
-          path: resources/taxsim35/taxsim35-*.exe
-
-      - name: Download TAXSIM executables
-        uses: actions/download-artifact@v2
-        with:
-          name: taxsim-executables
-          path: resources/taxsim35/
-
       - name: Make TAXSIM executables executable (Unix)
         if: runner.os != 'Windows'
         run: chmod +x resources/taxsim35/taxsim35-*.exe
