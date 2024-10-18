@@ -1,38 +1,39 @@
-name: Debug PR Workflow
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python package
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
-  debug:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Debug GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
-      - name: Debug event info
-        if: github.event_name == 'pull_request'
-        env:
-          EVENT_CONTEXT: ${{ toJson(github.event) }}
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
         run: |
-          echo "Pull Request Event Info:"
-          echo "$EVENT_CONTEXT"
-
-      - name: Run a simple test
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
         run: |
-          echo "This workflow ran successfully"
-          echo "Event name: ${{ github.event_name }}"
-          echo "PR number: ${{ github.event.pull_request.number }}"
-          echo "PR title: ${{ github.event.pull_request.title }}"
-          echo "PR base ref: ${{ github.event.pull_request.base.ref }}"
-          echo "PR head ref: ${{ github.event.pull_request.head.ref }}"
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          pytest
