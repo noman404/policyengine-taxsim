@@ -7,7 +7,7 @@ name = "policyengine-taxsim"
 version = "0.1.0"
 description = "A TAXSIM emulator using PolicyEngine US"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
     {name = "Al Noman", email = "al@policyengine.org"},

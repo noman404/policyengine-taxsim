@@ -1,7 +1,7 @@
 annotated-types==0.7.0
 backcall==0.2.0
 black==24.4.2
-blosc2==2.0.0
+blosc2==2.3.0
 cachetools==5.3.3
 certifi==2024.6.2
 charset-normalizer==3.3.2
@@ -46,7 +46,7 @@ numpy==1.24.4
 packaging==24.0
 pandas==2.2.2
 parso==0.8.4
-pathlib==1.0.1
+pathlib==1.0.1 # causing error when building exe, emulator works without it
 pathspec==0.12.1
 patsy==0.5.6
 pickleshare==0.7.5
@@ -81,7 +81,7 @@ six==1.16.0
 sortedcontainers==2.4.0
 statsmodels==0.14.2
 synthimpute==0.1
-tables==3.8.0
+tables==3.9.2
 tabulate==0.9.0
 tenacity==8.3.0
 threadpoolctl==3.5.0
