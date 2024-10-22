@@ -40,14 +40,17 @@ def export_single_household(policyengine_situation):
         .get("your spouse", {})
         .get("age", {})
         .get(year, 0),
-        "fiitax": simulation.calculate("income_tax", period=year),
-        "siitax": simulation.calculate("state_income_tax", period=year),
-        "fica": simulation.calculate(
+        "fiitax": to_round_up_number(simulation.calculate("income_tax", period=year)),
+        "siitax": to_round_up_number(simulation.calculate("state_income_tax", period=year)),
+        "fica": to_round_up_number(simulation.calculate(
             "employee_social_security_tax", period=year
         )
-        + simulation.calculate("employee_medicare_tax", period=year),
+        + simulation.calculate("employee_medicare_tax", period=year)),
     }
 
     # Add more variables as needed to match TAXSIM output
 
     return taxsim_output
+
+def to_round_up_number(pe_array):
+    return round(pe_array[0], 2)
