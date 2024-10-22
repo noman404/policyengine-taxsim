@@ -120,54 +120,5 @@ class E2ETest(unittest.TestCase):
         self.assertTrue(year_matched, "year do not match")
 
 
-        # Compare numeric columns with a small tolerance
-        # is_close = np.allclose(
-        #     taxsim35_csv[numeric_columns],
-        #     pe_taxsim_csv[numeric_columns],
-        #     rtol=1e-5,
-        #     atol=1e-8,
-        #     equal_nan=True,
-        # )
-        #
-        # # Compare non-numeric columns exactly
-        # non_numeric_columns = taxsim35_csv.select_dtypes(
-        #     exclude=["number"]
-        # ).columns
-        # is_exact = (
-        #     (
-        #             taxsim35_csv[non_numeric_columns]
-        #             == pe_taxsim_csv[non_numeric_columns]
-        #     )
-        #     .all()
-        #     .all()
-        # )
-        #
-        # is_matched = is_close and is_exact
-
-        # if not is_matched:
-        #     print("\nDifferences found:")
-        #     for col in common_columns:
-        #         if not np.allclose(
-        #             taxsim35_csv[col],
-        #             pe_taxsim_csv[col],
-        #             rtol=1e-5,
-        #             atol=1e-8,
-        #             equal_nan=True,
-        #         ):
-        #             print(f"\nDifferences in {col}:")
-        #             print(
-        #                 pd.DataFrame(
-        #                     {
-        #                         "TAXSIM35": taxsim35_csv[col],
-        #                         "PolicyEngine": pe_taxsim_csv[col],
-        #                         "Difference": taxsim35_csv[col]
-        #                         - pe_taxsim_csv[col],
-        #                     }
-        #                 )
-        #             )
-        #
-        # self.assertTrue(is_matched, "Outputs do not match")
-
-
 if __name__ == "__main__":
     unittest.main()
