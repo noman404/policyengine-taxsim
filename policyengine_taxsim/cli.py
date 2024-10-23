@@ -27,7 +27,7 @@ def main(input_file, output):
         for _, row in df.iterrows():
             taxsim_input = row.to_dict()
             pe_situation = import_single_household(taxsim_input)
-            taxsim_output = export_single_household(pe_situation)
+            taxsim_output = export_single_household(taxsim_input, pe_situation)
             results.append(taxsim_output)
 
         # Create output dataframe and save to csv
