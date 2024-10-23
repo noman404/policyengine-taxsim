@@ -9,6 +9,7 @@ def test_import_single_household():
         "state": 6,  # Colorado
         "page": 35,
         "pwages": 50000,
+        "taxsimid": 999
     }
 
     expected_output = {
@@ -29,6 +30,14 @@ def test_import_single_household():
 
 
 def test_export_single_household():
+    taxsim_input = {
+        "year": 2022,
+        "state": 6,  # Colorado
+        "page": 35,
+        "pwages": 50000,
+        "taxsimid": 999
+    }
+
     policyengine_situation = {
         "people": {
             "you": {"age": {"2022": 35}, "employment_income": {"2022": 50000}}
@@ -42,7 +51,7 @@ def test_export_single_household():
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = export_single_household(policyengine_situation)
+    result = export_single_household(taxsim_input, policyengine_situation)
 
     assert result["year"] == 2022
     assert result["state"] == 6  # Colorado
@@ -54,7 +63,7 @@ def test_export_single_household():
 
 @pytest.fixture
 def sample_taxsim_input():
-    return {"year": 2022, "state": 6, "page": 35, "pwages": 50000}  # Colorado
+    return {"year": 2022, "state": 6, "page": 35, "pwages": 50000, "taxsimid": 999}  # Colorado
 
 
 def test_roundtrip(sample_taxsim_input):
@@ -62,7 +71,7 @@ def test_roundtrip(sample_taxsim_input):
     pe_situation = import_single_household(sample_taxsim_input)
 
     # Export PolicyEngine situation back to TAXSIM output
-    taxsim_output = export_single_household(pe_situation)
+    taxsim_output = export_single_household(sample_taxsim_input, pe_situation)
 
     # Check that key information is preserved
     assert taxsim_output["year"] == sample_taxsim_input["year"]
