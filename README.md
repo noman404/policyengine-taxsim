@@ -2,15 +2,11 @@
 TAXSIM emulator using the PolicyEngine US federal and state tax calculator
 
 ## How to use the emulator ##
-The emulator takes a .raw file in the form of a csv. This is the same form of input that Taxsim-35 takes.
+The emulator takes a .csv file in the form of a csv. This is the same form of input that Taxsim-35 takes.
 
 In terminal, run 
 
-`python3 /Path/to/taxsim_emulator.py /Path/to/your/input_file.raw `
-
-If the emulator and input file are in the current working directory, run:
-
-`python3 taxsim_emulator.py taxsim_input.raw`
+`python policyengine_taxsim/cli.py resources/taxsim35/taxsim_input.csv `
 
 Output will be generated as `output.csv` in the same directory
 
