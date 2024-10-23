@@ -5,7 +5,7 @@ from pathlib import Path
 def load_variable_mappings():
     """Load variable mappings from YAML file."""
     config_path = (
-        Path(__file__).parent.parent / "config" / "variable_mappings.yaml"
+            Path(__file__).parent.parent / "config" / "variable_mappings.yaml"
     )
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
@@ -84,7 +84,11 @@ def is_date(string):
     try:
         year = int(string)
         return (
-            1900 <= year <= 2100
+                1900 <= year <= 2100
         )  # Assuming years between 1900 and 2100 are valid
     except ValueError:
         return False
+
+
+def to_roundedup_number(pe_array):
+    return round(pe_array[0], 2)
