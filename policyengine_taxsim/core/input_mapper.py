@@ -18,7 +18,7 @@ def import_single_household(taxsim_vars):
 
     year = str(int(taxsim_vars["year"]))  # Ensure year is an integer string
     
-    if "state" not in taxsim_vars: # If state is not provided set it to AL as default calculation
+    if "state" not in taxsim_vars: # If state is not provided set it to AL as default state
         taxsim_vars["state"] = 1
 
     state = get_state_code(taxsim_vars["state"])
