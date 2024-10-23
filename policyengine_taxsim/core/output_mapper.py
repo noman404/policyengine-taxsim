@@ -5,7 +5,7 @@ from policyengine_taxsim.core.utils import (
 from policyengine_us import Simulation
 
 
-def export_single_household(policyengine_situation):
+def export_single_household(taxsim_input, policyengine_situation):
     """
     Convert a PolicyEngine situation to TAXSIM output variables.
 
@@ -29,7 +29,7 @@ def export_single_household(policyengine_situation):
     ][year]
 
     taxsim_output = {
-        "taxsimid": policyengine_situation.get("taxsimid", 1),
+        "taxsimid": policyengine_situation.get("taxsimid", taxsim_input['taxsimid']),
         "year": int(year),
         "state": get_state_number(state_name),
         "mstat": policyengine_situation["tax_units"]["your tax unit"]
