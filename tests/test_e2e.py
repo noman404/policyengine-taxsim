@@ -117,7 +117,12 @@ class E2ETest(unittest.TestCase):
 
         # Compare year matched
         year_matched = (taxsim35_csv['year'] == pe_taxsim_csv['year']).all()
-        self.assertTrue(year_matched, "year do not match")
+
+        fiitax_match = (taxsim35_csv['fiitax'] == pe_taxsim_csv['fiitax']).all()
+        siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
+
+        self.assertTrue(year_matched and fiitax_match and siitax_match, f"{year_matched} {fiitax_match} {siitax_match} do not match")
+
 
 
 if __name__ == "__main__":
