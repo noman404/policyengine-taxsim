@@ -129,7 +129,7 @@ class E2ETest(unittest.TestCase):
 
         full_output = False
 
-        state_agi_match = v45_matched = v35_matched = True
+        state_agi_match = v45_matched = v13_matched = v19_matched = v26_matched = v28_matched = True
         for index, row in input_csv.iterrows():
             if row['idtl'] == 2:
                 full_output = True
@@ -139,15 +139,24 @@ class E2ETest(unittest.TestCase):
                 if not (taxsim35_csv.at[index, 'v45'] == pe_taxsim_csv.at[index, 'v45']):
                     v45_matched = False
                     break
-                if not (taxsim35_csv.at[index, 'v35'] == pe_taxsim_csv.at[index, 'v35']):
-                    v35_matched = False
+                if not (taxsim35_csv.at[index, 'v26'] == pe_taxsim_csv.at[index, 'v26']):
+                    v26_matched = False
+                    break
+                if not (taxsim35_csv.at[index, 'v13'] == pe_taxsim_csv.at[index, 'v13']):
+                    v13_matched = False
+                    break
+                if not (taxsim35_csv.at[index, 'v19'] == pe_taxsim_csv.at[index, 'v19']):
+                    v19_matched = False
+                    break
+                if not (taxsim35_csv.at[index, 'v28'] == pe_taxsim_csv.at[index, 'v28']):
+                    v28_matched = False
                     break
 
         if full_output:
             print("full output")
             self.assertTrue(
-                year_matched and fiitax_match and siitax_match and state_agi_match and v35_matched and v45_matched,
-                f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
+                year_matched and fiitax_match and siitax_match and state_agi_match and v13_matched and v19_matched and v26_matched and v28_matched and v45_matched,
+                f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} {v13_matched} {v19_matched} {v26_matched} {v28_matched} {v45_matched} do not match")
         else:
             print("standard output")
             self.assertTrue(year_matched and fiitax_match and siitax_match,
