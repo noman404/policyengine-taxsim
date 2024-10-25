@@ -226,12 +226,12 @@ policyengine_to_taxsim:
      - full_text: 5
   v37:
     variable: state_property_tax_credit
-    implemented: true
+    implemented: false
     idtl:
      - full: 2
      - full_text: 5
   v38:
-    variable: child_care_credit
+    variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2

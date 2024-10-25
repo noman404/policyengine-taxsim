@@ -128,21 +128,30 @@ class E2ETest(unittest.TestCase):
         siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
 
         full_output = False
-        state_agi_match = True
+
+        state_agi_match = v45_matched = v35_matched = True
         for index, row in input_csv.iterrows():
             if row['idtl'] == 2:
                 full_output = True
                 if not (taxsim35_csv.at[index, 'v10'] == pe_taxsim_csv.at[index, 'v10']):
                     state_agi_match = False
                     break
+                if not (taxsim35_csv.at[index, 'v45'] == pe_taxsim_csv.at[index, 'v45']):
+                    v45_matched = False
+                    break
+                if not (taxsim35_csv.at[index, 'v35'] == pe_taxsim_csv.at[index, 'v35']):
+                    v35_matched = False
+                    break
 
         if full_output:
             print("full output")
-            self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
+            self.assertTrue(
+                year_matched and fiitax_match and siitax_match and state_agi_match and v35_matched and v45_matched,
+                f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
         else:
             print("standard output")
-            self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match}  do not match")
-
+            self.assertTrue(year_matched and fiitax_match and siitax_match,
+                            f"{year_matched} {fiitax_match} {siitax_match} do not match")
 
 
 if __name__ == "__main__":
