@@ -24,28 +24,32 @@ def export_single_household(taxsim_input, policyengine_situation):
             "state_name"
         ].keys()
     )[0]
+
     state_name = policyengine_situation["households"]["your household"][
         "state_name"
     ][year]
 
-    taxsim_full_output = {}
-    taxsim_full_output["taxsimid"] = policyengine_situation.get("taxsimid", taxsim_input['taxsimid'])
+    taxsim_output = {}
+    taxsim_output["taxsimid"] = policyengine_situation.get("taxsimid", taxsim_input['taxsimid'])
+    output_type = taxsim_input["idtl"]
 
     for key, value in mappings.items():
         if value['implemented']:
             if key == "year":
-                taxsim_full_output[key] = int(year)
+                taxsim_output[key] = int(year)
             elif key == "state":
-                taxsim_full_output[key] = get_state_number(state_name)
+                taxsim_output[key] = get_state_number(state_name)
             else:
                 pe_variable = value['variable']
+
                 if "state" in pe_variable:
                     pe_variable = pe_variable.replace("state", state_name).lower()
-                taxsim_full_output[key] = simulate(simulation, pe_variable, year)
 
-        # Add more variables as needed to match TAXSIM output
+                for entry in value['idtl']:
+                    if output_type in entry.values():
+                        taxsim_output[key] = simulate(simulation, pe_variable, year)
 
-    return taxsim_full_output
+    return taxsim_output
 
 
 def simulate(simulation, variable, year):

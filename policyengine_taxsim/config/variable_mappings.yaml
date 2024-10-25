@@ -1,283 +1,283 @@
 policyengine_to_taxsim:
   year:
     variable: get_year
-    implemented: yes
+    implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   state:
     variable: get_state_code
-    implemented: yes
+    implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   fiitax:
     variable: income_tax
     implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   siitax:
     variable: state_income_tax
     implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   fica:
     variable: employee_social_security_tax
     implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   frate:
-    variable: federal_mtr
+    variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   srate:
-    variable: state_mtr
+    variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   ficar:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   tfica:
     variable: taxsim_tfica
     implemented: true
     idtl:
-     - 0
-     - 2
-     - 5
+     - standard : 0
+     - full: 2
+     - full_text: 5
   v10:
     variable: state_agi
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v11:
     variable: tax_unit_taxable_unemployment_compensation
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v12:
     variable: tax_unit_taxable_social_security
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v13:
     variable: basic_standard_deduction
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v14:
     variable: exemptions
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v15:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v16:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v17:
     variable: taxable_income_deductions
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v18:
     variable: taxable_income
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v19:
     variable: income_tax_before_credits
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v20:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v21:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v22:
     variable: ctc
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v23:
     variable: refundable_ctc
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v24:
     variable: cdcc
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v25:
     variable: eitc
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v26:
     variable: amt_income
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v27:
     variable: alternative_minimum_tax
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v28:
     variable: income_tax_before_refundable_credits
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v29:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v30:
     variable: household_net_income
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v31:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v32:
     variable: state_agi
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v33:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v34:
     variable: state_standard_deduction
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v35:
     variable: state_itemized_deductions
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v36:
     variable: state_taxable_income
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v37:
     variable: state_property_tax_credit
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v38:
     variable: child_care_credit
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v39:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v40:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v41:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v42:
     variable: self_employment_income
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v43:
     variable: net_investment_income_tax
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v44:
     variable: employee_medicare_tax
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
   v45:
     variable: recovery_rebate_credit
     implemented: true
     idtl:
-     - 2
-     - 5
+     - full: 2
+     - full_text: 5
 
 taxsim_to_policyengine:
   # This section would be the inverse of the above mapping

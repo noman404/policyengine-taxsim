@@ -10,7 +10,8 @@ def sample_taxsim_input():
         "state": 3,
         "page": 35,
         "pwages": 50000,
-        "taxsimid": 11
+        "taxsimid": 11,
+        "idtl": 0
     }
 
 

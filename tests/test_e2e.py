@@ -80,8 +80,11 @@ class E2ETest(unittest.TestCase):
         pe_taxsim_csv = pd.read_csv(
             self.output_dir / "policyengine_taxsim_output.csv"
         )
+        input_csv = pd.read_csv(self.input_file)
 
-        print("TAXSIM35 output:")
+        print("Input CSV:")
+        print(input_csv)
+        print("\nTAXSIM35 output:")
         print(taxsim35_csv)
         print("\nPolicyEngine TAXSIM output:")
         print(pe_taxsim_csv)
@@ -102,6 +105,9 @@ class E2ETest(unittest.TestCase):
         pe_taxsim_csv = pe_taxsim_csv.sort_values("taxsimid").reset_index(
             drop=True
         )
+        input_csv = input_csv.sort_values("taxsimid").reset_index(
+            drop=True
+        )
 
         # Convert numeric columns to float
         numeric_columns = taxsim35_csv.select_dtypes(
@@ -115,14 +121,27 @@ class E2ETest(unittest.TestCase):
                 pe_taxsim_csv[col], errors="coerce"
             )
 
-        # Compare year matched
+        # Compare
         year_matched = (taxsim35_csv['year'] == pe_taxsim_csv['year']).all()
 
         fiitax_match = (taxsim35_csv['fiitax'] == pe_taxsim_csv['fiitax']).all()
         siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
-        state_agi_match = (taxsim35_csv['v10'] == pe_taxsim_csv['v10']).all()
 
-        self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
+        full_output = False
+        state_agi_match = True
+        for index, row in input_csv.iterrows():
+            if row['idtl'] == 2:
+                full_output = True
+                if not (taxsim35_csv.at[index, 'v10'] == pe_taxsim_csv.at[index, 'v10']):
+                    state_agi_match = False
+                    break
+
+        if full_output:
+            print("full output")
+            self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
+        else:
+            print("standard output")
+            self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match}  do not match")
 
 
 
