@@ -120,8 +120,9 @@ class E2ETest(unittest.TestCase):
 
         fiitax_match = (taxsim35_csv['fiitax'] == pe_taxsim_csv['fiitax']).all()
         siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
+        state_agi_match = (taxsim35_csv['v10'] == pe_taxsim_csv['v10']).all()
 
-        self.assertTrue(year_matched and fiitax_match and siitax_match, f"{year_matched} {fiitax_match} {siitax_match} do not match")
+        self.assertTrue(year_matched and fiitax_match and siitax_match and state_agi_match, f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} do not match")
 
 
 
