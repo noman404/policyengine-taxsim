@@ -4,7 +4,13 @@ TAXSIM emulator using the PolicyEngine US federal and state tax calculator
 ## How to use the emulator ##
 The emulator takes a .csv file in the form of a csv. This is the same form of input that Taxsim-35 takes.
 
-In terminal, run 
+**Open your terminal in the parent directory**
+
+1. Install necessary dependencies
+
+`pip install -e .`
+
+2. to execute the simulation, run 
 
 `python policyengine_taxsim/cli.py resources/taxsim35/taxsim_input.csv `
 
