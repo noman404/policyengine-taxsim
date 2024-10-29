@@ -1,3 +1,4 @@
+import numpy as np
 import yaml
 from pathlib import Path
 
@@ -90,5 +91,8 @@ def is_date(string):
         return False
 
 
-def to_roundedup_number(pe_array):
-    return round(pe_array[0], 2)
+def to_roundedup_number(value):
+    if isinstance(value, np.ndarray):
+        return round(value[0], 2)
+    else:
+        return round(value, 2)

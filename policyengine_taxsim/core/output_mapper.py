@@ -24,30 +24,36 @@ def export_single_household(taxsim_input, policyengine_situation):
             "state_name"
         ].keys()
     )[0]
+
     state_name = policyengine_situation["households"]["your household"][
         "state_name"
     ][year]
 
-    taxsim_output = {
-        "taxsimid": policyengine_situation.get("taxsimid", taxsim_input['taxsimid']),
-        "year": int(year),
-        "state": get_state_number(state_name),
-        "mstat": policyengine_situation["tax_units"]["your tax unit"]
-        .get("marital_status", {})
-        .get(year, 1),
-        "page": policyengine_situation["people"]["you"]["age"][year],
-        "sage": policyengine_situation["people"]
-        .get("your spouse", {})
-        .get("age", {})
-        .get(year, 0),
-        "fiitax": to_roundedup_number(simulation.calculate("income_tax", period=year)),
-        "siitax": to_roundedup_number(simulation.calculate("state_income_tax", period=year)),
-        "fica": to_roundedup_number(simulation.calculate(
-            "employee_social_security_tax", period=year
-        )
-        + simulation.calculate("employee_medicare_tax", period=year)),
-    }
+    taxsim_output = {}
+    taxsim_output["taxsimid"] = policyengine_situation.get("taxsimid", taxsim_input['taxsimid'])
+    output_type = taxsim_input["idtl"]
 
-    # Add more variables as needed to match TAXSIM output
+    for key, value in mappings.items():
+        if value['implemented']:
+            if key == "year":
+                taxsim_output[key] = int(year)
+            elif key == "state":
+                taxsim_output[key] = get_state_number(state_name)
+            else:
+                pe_variable = value['variable']
+
+                if "state" in pe_variable:
+                    pe_variable = pe_variable.replace("state", state_name).lower()
+
+                for entry in value['idtl']:
+                    if output_type in entry.values():
+                        taxsim_output[key] = simulate(simulation, pe_variable, year)
 
     return taxsim_output
+
+
+def simulate(simulation, variable, year):
+    try:
+        return to_roundedup_number(simulation.calculate(variable, period=year))
+    except:
+        return 0.00

@@ -80,8 +80,11 @@ class E2ETest(unittest.TestCase):
         pe_taxsim_csv = pd.read_csv(
             self.output_dir / "policyengine_taxsim_output.csv"
         )
+        input_csv = pd.read_csv(self.input_file)
 
-        print("TAXSIM35 output:")
+        print("Input CSV:")
+        print(input_csv)
+        print("\nTAXSIM35 output:")
         print(taxsim35_csv)
         print("\nPolicyEngine TAXSIM output:")
         print(pe_taxsim_csv)
@@ -102,6 +105,9 @@ class E2ETest(unittest.TestCase):
         pe_taxsim_csv = pe_taxsim_csv.sort_values("taxsimid").reset_index(
             drop=True
         )
+        input_csv = input_csv.sort_values("taxsimid").reset_index(
+            drop=True
+        )
 
         # Convert numeric columns to float
         numeric_columns = taxsim35_csv.select_dtypes(
@@ -115,15 +121,37 @@ class E2ETest(unittest.TestCase):
                 pe_taxsim_csv[col], errors="coerce"
             )
 
-        # Compare year matched
-        year_matched = (taxsim35_csv['year'] == pe_taxsim_csv['year']).all()
+        # Compare
+        standard_output_cols = ["year", "fiitax", "siitax"]
+        full_output_cols = standard_output_cols + [
+            "tfica"
+            "v10",  # state_agi
+            "v13",
+            "v18",
+            "v19",
+            "v26",
+            "v28",
+            "v34",
+            "v45",
+        ]
 
-        fiitax_match = (taxsim35_csv['fiitax'] == pe_taxsim_csv['fiitax']).all()
-        siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
+        # Determine which columns to check based on idtl value
+        columns_to_check = full_output_cols if (input_csv["idtl"] == 2).any() else standard_output_cols
 
-        self.assertTrue(year_matched and fiitax_match and siitax_match, f"{year_matched} {fiitax_match} {siitax_match} do not match")
+        # Compare all relevant columns at once
+        comparison_results = {}
+        for col in columns_to_check:
+            if col in common_columns:
+                matches = (taxsim35_csv[col] == pe_taxsim_csv[col]).all()
+                comparison_results[col] = matches
+                if not matches:
+                    print(f"Mismatch in column {col}:")
+                    print(f"TAXSIM35 values: {taxsim35_csv[col].values}")
+                    print(f"PolicyEngine values: {pe_taxsim_csv[col].values}")
 
-
+        # Assert all columns match
+        all_matched = all(comparison_results.values())
+        self.assertTrue(all_matched, f"Columns with missmatches: {[col for col, matched in comparison_results.items() if not matched]}")
 
 if __name__ == "__main__":
     unittest.main()

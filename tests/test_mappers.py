@@ -3,67 +3,58 @@ from policyengine_taxsim.core.input_mapper import import_single_household
 from policyengine_taxsim.core.output_mapper import export_single_household
 
 
-def test_import_single_household():
-    taxsim_input = {
-        "year": 2022,
-        "state": 6,  # Colorado
+@pytest.fixture
+def sample_taxsim_input():
+    return {
+        "year": 2021,
+        "state": 3,
         "page": 35,
         "pwages": 50000,
-        "taxsimid": 999
+        "taxsimid": 11,
+        "idtl": 0
     }
 
+
+def test_import_single_household(sample_taxsim_input):
     expected_output = {
         "people": {
-            "you": {"age": {"2022": 35}, "employment_income": {"2022": 50000}}
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
         },
         "households": {
             "your household": {
                 "members": ["you"],
-                "state_name": {"2022": "CO"},
+                "state_name": {"2021": "AZ"},
             }
         },
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = import_single_household(taxsim_input)
+    result = import_single_household(sample_taxsim_input)
     assert result == expected_output
 
 
-def test_export_single_household():
-    taxsim_input = {
-        "year": 2022,
-        "state": 6,  # Colorado
-        "page": 35,
-        "pwages": 50000,
-        "taxsimid": 999
-    }
-
+def test_export_single_household(sample_taxsim_input):
     policyengine_situation = {
         "people": {
-            "you": {"age": {"2022": 35}, "employment_income": {"2022": 50000}}
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
         },
         "households": {
             "your household": {
                 "members": ["you"],
-                "state_name": {"2022": "CO"},
+                "state_name": {"2021": "AZ"},
             }
         },
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = export_single_household(taxsim_input, policyengine_situation)
-
-    assert result["year"] == 2022
-    assert result["state"] == 6  # Colorado
+    result = export_single_household(sample_taxsim_input, policyengine_situation)
+    print(result)
+    assert result["year"] == 2021
+    assert result["state"] == 3
     assert "fiitax" in result
     assert "siitax" in result
     # Note: We can't easily predict the exact tax values without mocking the PolicyEngine simulation,
     # so we're just checking that these keys exist in the output.
-
-
-@pytest.fixture
-def sample_taxsim_input():
-    return {"year": 2022, "state": 6, "page": 35, "pwages": 50000, "taxsimid": 999}  # Colorado
 
 
 def test_roundtrip(sample_taxsim_input):
