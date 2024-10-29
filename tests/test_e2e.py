@@ -122,57 +122,36 @@ class E2ETest(unittest.TestCase):
             )
 
         # Compare
-        year_matched = (taxsim35_csv['year'] == pe_taxsim_csv['year']).all()
+        standard_output_cols = ["year", "fiitax", "siitax"]
+        full_output_cols = standard_output_cols + [
+            "tfica"
+            "v10",  # state_agi
+            "v13",
+            "v18",
+            "v19",
+            "v26",
+            "v28",
+            "v34",
+            "v45",
+        ]
 
-        fiitax_match = (taxsim35_csv['fiitax'] == pe_taxsim_csv['fiitax']).all()
-        siitax_match = (taxsim35_csv['siitax'] == pe_taxsim_csv['siitax']).all()
+        # Determine which columns to check based on idtl value
+        columns_to_check = full_output_cols if (input_csv["idtl"] == 2).any() else standard_output_cols
 
-        full_output = False
+        # Compare all relevant columns at once
+        comparison_results = {}
+        for col in columns_to_check:
+            if col in common_columns:
+                matches = (taxsim35_csv[col] == pe_taxsim_csv[col]).all()
+                comparison_results[col] = matches
+                if not matches:
+                    print(f"Mismatch in column {col}:")
+                    print(f"TAXSIM35 values: {taxsim35_csv[col].values}")
+                    print(f"PolicyEngine values: {pe_taxsim_csv[col].values}")
 
-        # perform test on other fields when output type is full/idtl ==2
-        state_agi_match = v45_matched = v13_matched = v19_matched = v26_matched = v18_matched = v34_matched = v28_matched = tfica_matched = True
-        for index, row in input_csv.iterrows():
-            if row['idtl'] == 2:
-                full_output = True
-
-                if not (taxsim35_csv.at[index, 'v10'] == pe_taxsim_csv.at[index, 'v10']):
-                    state_agi_match = False
-                    break
-                if not (taxsim35_csv.at[index, 'v45'] == pe_taxsim_csv.at[index, 'v45']):
-                    v45_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v26'] == pe_taxsim_csv.at[index, 'v26']):
-                    v26_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v13'] == pe_taxsim_csv.at[index, 'v13']):
-                    v13_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v19'] == pe_taxsim_csv.at[index, 'v19']):
-                    v19_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v28'] == pe_taxsim_csv.at[index, 'v28']):
-                    v28_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v18'] == pe_taxsim_csv.at[index, 'v18']):
-                    v18_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'v34'] == pe_taxsim_csv.at[index, 'v34']):
-                    v34_matched = False
-                    break
-                if not (taxsim35_csv.at[index, 'tfica'] == pe_taxsim_csv.at[index, 'tfica']):
-                    tfica_matched = False
-                    break
-
-        if full_output:
-            print("full output")
-            self.assertTrue(
-                year_matched and fiitax_match and siitax_match and state_agi_match and v13_matched and v19_matched and v26_matched and v28_matched and v45_matched and v18_matched and v34_matched and tfica_matched,
-                f"{year_matched} {fiitax_match} {siitax_match} {state_agi_match} {v13_matched} {v19_matched} {v26_matched} {v28_matched} {v45_matched} {v18_matched} {v34_matched} {tfica_matched} do not match")
-        else:
-            print("standard output")
-            self.assertTrue(year_matched and fiitax_match and siitax_match,
-                            f"{year_matched} {fiitax_match} {siitax_match} do not match")
-
+        # Assert all columns match
+        all_matched = all(comparison_results.values())
+        self.assertTrue(all_matched, f"Columns with missmatches: {[col for col, matched in comparison_results.items() if not matched]}")
 
 if __name__ == "__main__":
     unittest.main()
