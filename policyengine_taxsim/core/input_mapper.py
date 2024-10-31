@@ -17,10 +17,8 @@ def import_single_household(taxsim_vars):
     mappings = load_variable_mappings()["taxsim_to_policyengine"]
 
     year = str(int(taxsim_vars["year"]))  # Ensure year is an integer string
-    
-    if "state" not in taxsim_vars: # If state is not provided set it to AL as default state
-        taxsim_vars["state"] = 2
 
+    taxsim_vars["state"] = taxsim_vars.get("state", 44) or 44 #set TX texas as default is no state has passed or passed as 0
     state = get_state_code(taxsim_vars["state"])
 
     situation = {

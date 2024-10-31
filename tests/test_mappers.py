@@ -15,6 +15,29 @@ def sample_taxsim_input():
     }
 
 
+@pytest.fixture
+def sample_taxsim_input_without_state():
+    return {
+        "year": 2021,
+        "page": 35,
+        "pwages": 50000,
+        "taxsimid": 11,
+        "idtl": 0
+    }
+
+
+@pytest.fixture
+def sample_taxsim_input_with_state_eq_0():
+    return {
+        "year": 2021,
+        "page": 35,
+        "state": 0,
+        "pwages": 50000,
+        "taxsimid": 11,
+        "idtl": 0
+    }
+
+
 def test_import_single_household(sample_taxsim_input):
     expected_output = {
         "people": {
@@ -30,6 +53,42 @@ def test_import_single_household(sample_taxsim_input):
     }
 
     result = import_single_household(sample_taxsim_input)
+    assert result == expected_output
+
+
+def test_import_single_household_without_state(sample_taxsim_input_without_state):
+    expected_output = {
+        "people": {
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
+        },
+        "households": {
+            "your household": {
+                "members": ["you"],
+                "state_name": {"2021": "TX"},
+            }
+        },
+        "tax_units": {"your tax unit": {"members": ["you"]}},
+    }
+
+    result = import_single_household(sample_taxsim_input_without_state)
+    assert result == expected_output
+
+
+def test_import_single_household_with_state_eq_0(sample_taxsim_input_with_state_eq_0):
+    expected_output = {
+        "people": {
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
+        },
+        "households": {
+            "your household": {
+                "members": ["you"],
+                "state_name": {"2021": "TX"},
+            }
+        },
+        "tax_units": {"your tax unit": {"members": ["you"]}},
+    }
+
+    result = import_single_household(sample_taxsim_input_with_state_eq_0)
     assert result == expected_output
 
 

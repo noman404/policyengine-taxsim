@@ -16,6 +16,11 @@ The emulator takes a .csv file in the form of a csv. This is the same form of in
 
 Output will be generated as `output.csv` in the same directory
 
+
+You can install through to execute directly
+
+`pip install git+https://github.com/PolicyEngine/policyengine-taxsim.git`
+
 ### Example ##
 input file:
 
