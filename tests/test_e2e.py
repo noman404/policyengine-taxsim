@@ -80,12 +80,21 @@ class E2ETest(unittest.TestCase):
         # Print command for debugging
         print(f"Running command: {' '.join(cmd)}")
 
+        creation_flags = 0
+        if platform.system().lower() == "windows":
+            if hasattr(subprocess, 'CREATE_NO_WINDOW'):
+                creation_flags = subprocess.CREATE_NO_WINDOW
+            else:
+                # For Python < 3.11 on Windows
+                # DETACHED_PROCESS = 0x00000008
+                creation_flags = 0x00000008
+
         process = subprocess.run(
             cmd,
             shell=False,
             capture_output=True,
             text=True,
-            creationflags=subprocess.CREATE_NO_WINDOW
+            creationflags=creation_flags
         )
 
         print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
@@ -125,12 +134,21 @@ class E2ETest(unittest.TestCase):
                 # Windows specific handling
                 cmd = f'cmd.exe /c "type "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}""'
 
+            creation_flags = 0
+            if platform.system().lower() == "windows":
+                if hasattr(subprocess, 'CREATE_NO_WINDOW'):
+                    creation_flags = subprocess.CREATE_NO_WINDOW
+                else:
+                    # For Python < 3.11 on Windows
+                    # DETACHED_PROCESS = 0x00000008
+                    creation_flags = 0x00000008
+
             process = subprocess.run(
                 cmd,
                 shell=True,
                 capture_output=True,
                 text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW if platform.system().lower() == "windows" else 0
+                creationflags=creation_flags if platform.system().lower() == "windows" else 0
             )
 
             print(f"TAXSIM35 output:\n{process.stdout}")

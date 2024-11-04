@@ -73,3 +73,21 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
+
+[tool.nuitka]
+follow-imports = true
+standalone = true
+onefile = true
+# Remove or set to false since we need console
+# windows-disable-console = true
+include-data-dir = ["resources/taxsim35=resources/taxsim35"]
+include-package = [
+    "policyengine_taxsim",
+    "click",
+    "pandas",
+    "numpy"
+]
+plugin-enable = [
+    "numpy",
+    "pandas"
+]
