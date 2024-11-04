@@ -1,6 +1,6 @@
 import pytest
-from policyengine_taxsim.core.input_mapper import import_single_household
-from policyengine_taxsim.core.output_mapper import export_single_household
+
+from policyengine_taxsim import import_single_household, export_single_household
 
 
 @pytest.fixture

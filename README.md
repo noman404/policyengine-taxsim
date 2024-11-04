@@ -6,7 +6,7 @@ The emulator takes a .csv file in the form of a csv. This is the same form of in
 
 **Open your terminal in the parent directory**
 
-1. Install necessary dependencies
+1. To install this package
 
 `pip install -e .`
 

@@ -47,6 +47,7 @@ dependencies = [
     "pytest",
     "pytest-cov",
 ]
+
 [tool.hatch.envs.default.scripts]
 test = "pytest tests/ {args}"
 test-cov = "pytest tests/ --cov-report=term-missing --cov-config=pyproject.toml --cov=policyengine_taxsim {args}"

@@ -168,4 +168,3 @@ cython_debug/
 .idea/
 input/*
 output.csv
-taxsim_input.csv

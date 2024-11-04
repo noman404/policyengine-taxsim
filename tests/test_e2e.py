@@ -11,10 +11,38 @@ import sys
 class E2ETest(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.project_root = Path(__file__).parent.parent
-        self.taxsim_dir = self.project_root / "resources" / "taxsim35"
-        self.output_dir = self.project_root / "output"
+        import importlib.resources as pkg_resources
+        import policyengine_taxsim
+        from importlib.metadata import distribution
+
+        # Get the correct path to shared data
+        dist = distribution('policyengine-taxsim')
+        # Print for debugging
+        print(f"Distribution location: {dist.locate_file('share')}")
+
+        # Try different methods to locate the file
+        possible_paths = [
+            Path(dist.locate_file('share')) / 'policyengine_taxsim' / 'taxsim35',
+            Path(sys.prefix) / 'share' / 'policyengine_taxsim' / 'taxsim35',
+            Path(policyengine_taxsim.__file__).parent.parent / 'share' / 'policyengine_taxsim' / 'taxsim35'
+        ]
+
+        # Find the first path that exists and contains our files
+        for path in possible_paths:
+            if (path / 'taxsim_input.csv').exists():
+                self.taxsim_dir = path
+                break
+        else:
+            print("Searched in the following locations:")
+            for path in possible_paths:
+                print(f"  {path}")
+            raise FileNotFoundError("Could not find taxsim directory")
+
+        self.output_dir = Path.cwd() / "output"
         self.output_dir.mkdir(exist_ok=True)
+
+        # Get CLI path
+        self.cli_path = Path(policyengine_taxsim.__file__).parent / "cli.py"
 
         # Determine the correct TAXSIM executable based on the OS
         system = platform.system().lower()
@@ -29,12 +57,35 @@ class E2ETest(unittest.TestCase):
 
         self.input_file = self.taxsim_dir / "taxsim_input.csv"
 
-    def test_generate_policyengine_taxsim(self):
+        # Verify and print paths for debugging
+        print(f"\nDebug Information:")
+        print(f"Taxsim Directory: {self.taxsim_dir}")
+        print(f"Input File Path: {self.input_file}")
+        print(f"Input File Exists: {self.input_file.exists()}")
+        if self.input_file.exists():
+            print(f"Input File is Readable: {os.access(self.input_file, os.R_OK)}")
+
+    def test_generate_policyengine_taxsim_output(self):
         output_file = self.output_dir / "policyengine_taxsim_output.csv"
 
-        cmd = f"{sys.executable} {self.project_root}/policyengine_taxsim/cli.py {self.input_file} -o {output_file}"
+        # Use list form and absolute paths
+        cmd = [
+            sys.executable,
+            str(self.cli_path.absolute()),
+            str(self.input_file.absolute()),
+            "-o",
+            str(output_file.absolute())
+        ]
+
+        # Print command for debugging
+        print(f"Running command: {' '.join(cmd)}")
+
         process = subprocess.run(
-            cmd, shell=True, capture_output=True, text=True
+            cmd,
+            shell=False,
+            capture_output=True,
+            text=True,
+            creationflags=subprocess.CREATE_NO_WINDOW
         )
 
         print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
@@ -51,29 +102,46 @@ class E2ETest(unittest.TestCase):
         with open(output_file, "r") as f:
             print(f.read())
 
-    def test_generate_taxsim_output(self):
-        output_file = self.output_dir / "taxsim35_output.csv"
+    def test_generate_taxsim35_output(self):
+        import tempfile
+        import shutil
 
+        output_file = self.output_dir / "taxsim35_output.csv"
         taxsim_path = self.taxsim_dir / self.taxsim_exe
 
-        if platform.system().lower() != "windows":
-            # Make the file executable on Unix-like systems
-            os.chmod(taxsim_path, 0o755)
+        # Create a temporary directory for execution
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Copy executable and input to temp directory
+            temp_exe = Path(temp_dir) / self.taxsim_exe
+            temp_input = Path(temp_dir) / "input.csv"
 
-        cmd = f"{taxsim_path} < {self.input_file} > {output_file}"
-        process = subprocess.run(
-            cmd, shell=True, capture_output=True, text=True
-        )
+            shutil.copy2(taxsim_path, temp_exe)
+            shutil.copy2(self.input_file, temp_input)
 
-        print(f"TAXSIM35 output:\n{process.stdout}")
-        if process.returncode != 0:
-            print(f"TAXSIM35 failed with error:\n{process.stderr}")
-            raise Exception(f"TAXSIM35 failed: {process.returncode}")
+            if platform.system().lower() != "windows":
+                os.chmod(temp_exe, 0o755)
+                cmd = f'cat "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}"'
+            else:
+                # Windows specific handling
+                cmd = f'cmd.exe /c "type "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}""'
 
-        self.assertTrue(output_file.is_file())
-        print(f"Content of {output_file}:")
-        with open(output_file, "r") as f:
-            print(f.read())
+            process = subprocess.run(
+                cmd,
+                shell=True,
+                capture_output=True,
+                text=True,
+                creationflags=subprocess.CREATE_NO_WINDOW if platform.system().lower() == "windows" else 0
+            )
+
+            print(f"TAXSIM35 output:\n{process.stdout}")
+            if process.returncode != 0:
+                print(f"TAXSIM35 failed with error:\n{process.stderr}")
+                raise Exception(f"TAXSIM35 failed: {process.returncode}")
+
+            self.assertTrue(output_file.is_file())
+            print(f"Content of {output_file}:")
+            with open(output_file, "r") as f:
+                print(f.read())
 
     def test_match_both_output(self):
         taxsim35_csv = pd.read_csv(self.output_dir / "taxsim35_output.csv")
