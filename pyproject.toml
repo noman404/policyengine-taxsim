@@ -47,6 +47,7 @@ dependencies = [
     "pytest",
     "pytest-cov",
 ]
+
 [tool.hatch.envs.default.scripts]
 test = "pytest tests/ {args}"
 test-cov = "pytest tests/ --cov-report=term-missing --cov-config=pyproject.toml --cov=policyengine_taxsim {args}"
@@ -71,4 +72,22 @@ minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
     "tests",
+]
+
+[tool.nuitka]
+follow-imports = true
+standalone = true
+onefile = true
+# Remove or set to false since we need console
+# windows-disable-console = true
+include-data-dir = ["resources/taxsim35=resources/taxsim35"]
+include-package = [
+    "policyengine_taxsim",
+    "click",
+    "pandas",
+    "numpy"
+]
+plugin-enable = [
+    "numpy",
+    "pandas"
 ]

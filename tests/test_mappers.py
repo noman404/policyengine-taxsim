@@ -1,6 +1,6 @@
 import pytest
-from policyengine_taxsim.core.input_mapper import import_single_household
-from policyengine_taxsim.core.output_mapper import export_single_household
+
+from policyengine_taxsim import import_single_household, export_single_household
 
 
 @pytest.fixture
@@ -13,6 +13,24 @@ def sample_taxsim_input():
         "taxsimid": 11,
         "idtl": 0
     }
+
+
+sample_taxsim_input_without_state = {
+    "year": 2021,
+    "page": 35,
+    "pwages": 50000,
+    "taxsimid": 11,
+    "idtl": 0
+}
+
+sample_taxsim_input_with_state_eq_0 = {
+    "year": 2021,
+    "page": 35,
+    "state": 0,
+    "pwages": 50000,
+    "taxsimid": 11,
+    "idtl": 0
+}
 
 
 def test_import_single_household(sample_taxsim_input):
@@ -30,6 +48,42 @@ def test_import_single_household(sample_taxsim_input):
     }
 
     result = import_single_household(sample_taxsim_input)
+    assert result == expected_output
+
+
+def test_import_single_household_without_state():
+    expected_output = {
+        "people": {
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
+        },
+        "households": {
+            "your household": {
+                "members": ["you"],
+                "state_name": {"2021": "TX"},
+            }
+        },
+        "tax_units": {"your tax unit": {"members": ["you"]}},
+    }
+
+    result = import_single_household(sample_taxsim_input_without_state)
+    assert result == expected_output
+
+
+def test_import_single_household_with_state_eq_0():
+    expected_output = {
+        "people": {
+            "you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}
+        },
+        "households": {
+            "your household": {
+                "members": ["you"],
+                "state_name": {"2021": "TX"},
+            }
+        },
+        "tax_units": {"your tax unit": {"members": ["you"]}},
+    }
+
+    result = import_single_household(sample_taxsim_input_with_state_eq_0)
     assert result == expected_output
 
 

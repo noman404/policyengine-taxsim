@@ -6,7 +6,7 @@ The emulator takes a .csv file in the form of a csv. This is the same form of in
 
 **Open your terminal in the parent directory**
 
-1. Install necessary dependencies
+1. To install this package
 
 `pip install -e .`
 
@@ -15,6 +15,13 @@ The emulator takes a .csv file in the form of a csv. This is the same form of in
 `python policyengine_taxsim/cli.py resources/taxsim35/taxsim_input.csv `
 
 Output will be generated as `output.csv` in the same directory
+
+
+**For directly installing from pip**
+
+You can install through to execute directly
+
+`pip install git+https://github.com/PolicyEngine/policyengine-taxsim.git`
 
 ### Example ##
 input file:

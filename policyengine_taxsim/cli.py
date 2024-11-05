@@ -1,9 +1,12 @@
 import click
 import pandas as pd
 from pathlib import Path
-from policyengine_taxsim.core.input_mapper import import_single_household
-from policyengine_taxsim.core.output_mapper import export_single_household
-
+try:
+    from .core.input_mapper import import_single_household
+    from .core.output_mapper import export_single_household
+except ImportError:
+    from policyengine_taxsim.core.input_mapper import import_single_household
+    from policyengine_taxsim.core.output_mapper import export_single_household
 
 @click.command()
 @click.argument("input_file", type=click.Path(exists=True))

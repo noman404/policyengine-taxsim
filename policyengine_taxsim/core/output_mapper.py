@@ -1,4 +1,4 @@
-from policyengine_taxsim.core.utils import (
+from .utils import (
     load_variable_mappings,
     get_state_number, to_roundedup_number,
 )
