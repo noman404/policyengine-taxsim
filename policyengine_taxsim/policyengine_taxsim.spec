@@ -7,7 +7,7 @@ import policyengine_taxsim
 pe_data_path = Path(policyengine_us.__file__).parent / ""
 yaml_path = Path(policyengine_taxsim.__file__).parent / "config" / "variable_mappings.yaml"
 
-a = Analysis(
+analysis = Analysis(
     ['exe.py'],
     pathex=[],
     binaries=[],
@@ -38,14 +38,14 @@ a = Analysis(
     noarchive=False,
 )
 
-pyz = PYZ(a.pure, a.zipped_data)
+pyz = PYZ(analysis.pure, analysis.zipped_data)
 
 exe = EXE(
     pyz,
-    a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
+    analysis.scripts,
+    analysis.binaries,
+    analysis.zipfiles,
+    analysis.datas,
     [],
     name='policyengine-taxsim',
     debug=False,
