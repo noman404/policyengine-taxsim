@@ -27,6 +27,7 @@ dependencies = [
     "PyYAML",
     "click",
     "matplotlib",
+    "numpy"
 ]
 
 [project.urls]
@@ -39,8 +40,15 @@ policyengine-taxsim = "policyengine_taxsim.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["policyengine_taxsim"]
 
+include = [
+    "policyengine_taxsim/**/*.py",
+    "policyengine_taxsim/config/*.yaml",
+]
+
 [tool.hatch.build.targets.wheel.shared-data]
 "resources/taxsim35" = "share/policyengine_taxsim/taxsim35"
+"policyengine_taxsim/config" = "policyengine_taxsim/config"
+
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -72,22 +80,4 @@ minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
     "tests",
-]
-
-[tool.nuitka]
-follow-imports = true
-standalone = true
-onefile = true
-# Remove or set to false since we need console
-# windows-disable-console = true
-include-data-dir = ["resources/taxsim35=resources/taxsim35"]
-include-package = [
-    "policyengine_taxsim",
-    "click",
-    "pandas",
-    "numpy"
-]
-plugin-enable = [
-    "numpy",
-    "pandas"
 ]
