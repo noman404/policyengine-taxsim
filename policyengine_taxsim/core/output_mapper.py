@@ -16,7 +16,7 @@ def export_household(taxsim_input, policyengine_situation):
         dict: Dictionary of TAXSIM output variables
     """
     mappings = load_variable_mappings()["policyengine_to_taxsim"]
-
+    print(policyengine_situation)
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(
