@@ -105,7 +105,7 @@ policyengine_to_taxsim:
      - full: 2
      - full_text: 5
   v17:
-    variable: taxable_income_deductions
+    variable: taxable_income_deductions_if_itemizing
     implemented: true
     idtl:
      - full: 2
@@ -280,6 +280,25 @@ policyengine_to_taxsim:
      - full_text: 5
 
 taxsim_to_policyengine:
-  # This section would be the inverse of the above mapping
-  # It's left empty for brevity, but you should populate it
-  # with the inverse relationships for bidirectional conversion
+  household_situation:
+    families:
+      your family:
+        members: []
+    households:
+      your household:
+        members: []
+        state_name: {}
+    marital_units:
+      your marital unit:
+        members: []
+    people: {}
+    spm_units:
+      your household:
+        members: []
+    tax_units:
+      your tax unit:
+        members: []
+
+  household_type:
+    single_household: ["you"]
+    joint_household: ["you", "your partner"]
