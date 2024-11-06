@@ -1,6 +1,6 @@
 import pytest
 
-from policyengine_taxsim import import_single_household, export_single_household
+from policyengine_taxsim import generate_household, export_household
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def test_import_single_household(sample_taxsim_input):
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = import_single_household(sample_taxsim_input)
+    result = generate_household(sample_taxsim_input)
     assert result == expected_output
 
 
@@ -65,7 +65,7 @@ def test_import_single_household_without_state():
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = import_single_household(sample_taxsim_input_without_state)
+    result = generate_household(sample_taxsim_input_without_state)
     assert result == expected_output
 
 
@@ -83,7 +83,7 @@ def test_import_single_household_with_state_eq_0():
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = import_single_household(sample_taxsim_input_with_state_eq_0)
+    result = generate_household(sample_taxsim_input_with_state_eq_0)
     assert result == expected_output
 
 
@@ -101,7 +101,7 @@ def test_export_single_household(sample_taxsim_input):
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
 
-    result = export_single_household(sample_taxsim_input, policyengine_situation)
+    result = export_household(sample_taxsim_input, policyengine_situation)
     print(result)
     assert result["year"] == 2021
     assert result["state"] == 3
@@ -113,10 +113,10 @@ def test_export_single_household(sample_taxsim_input):
 
 def test_roundtrip(sample_taxsim_input):
     # Import TAXSIM input to PolicyEngine situation
-    pe_situation = import_single_household(sample_taxsim_input)
+    pe_situation = generate_household(sample_taxsim_input)
 
     # Export PolicyEngine situation back to TAXSIM output
-    taxsim_output = export_single_household(sample_taxsim_input, pe_situation)
+    taxsim_output = export_household(sample_taxsim_input, pe_situation)
 
     # Check that key information is preserved
     assert taxsim_output["year"] == sample_taxsim_input["year"]

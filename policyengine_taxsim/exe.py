@@ -7,9 +7,9 @@ import os
 
 # Delay imports until runtime
 def get_mappers():
-    from policyengine_taxsim.core.input_mapper import import_single_household
-    from policyengine_taxsim.core.output_mapper import export_single_household
-    return import_single_household, export_single_household
+    from policyengine_taxsim.core.input_mapper import generate_household
+    from policyengine_taxsim.core.output_mapper import export_household
+    return generate_household, export_household
 
 
 def get_yaml_path():

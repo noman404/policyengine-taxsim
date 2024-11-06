@@ -2,11 +2,11 @@ import click
 import pandas as pd
 from pathlib import Path
 try:
-    from .core.input_mapper import import_single_household
-    from .core.output_mapper import export_single_household
+    from .core.input_mapper import generate_household
+    from .core.output_mapper import export_household
 except ImportError:
-    from policyengine_taxsim.core.input_mapper import import_single_household
-    from policyengine_taxsim.core.output_mapper import export_single_household
+    from policyengine_taxsim.core.input_mapper import generate_household
+    from policyengine_taxsim.core.output_mapper import export_household
 
 @click.command()
 @click.argument("input_file", type=click.Path(exists=True))
@@ -29,8 +29,8 @@ def main(input_file, output):
         results = []
         for _, row in df.iterrows():
             taxsim_input = row.to_dict()
-            pe_situation = import_single_household(taxsim_input)
-            taxsim_output = export_single_household(taxsim_input, pe_situation)
+            pe_situation = generate_household(taxsim_input)
+            taxsim_output = export_household(taxsim_input, pe_situation)
             results.append(taxsim_output)
 
         # Create output dataframe and save to csv

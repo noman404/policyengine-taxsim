@@ -5,7 +5,7 @@ from .utils import (
 from policyengine_us import Simulation
 
 
-def export_single_household(taxsim_input, policyengine_situation):
+def export_household(taxsim_input, policyengine_situation):
     """
     Convert a PolicyEngine situation to TAXSIM output variables.
 
