@@ -36,6 +36,19 @@ def sample_taxsim_input_with_state_eq_0():
         "taxsimid": 11,
         "idtl": 0
     }
+@pytest.fixture
+def sample_taxsim_input_for_joint():
+    return {
+        "year": 2023,
+        "page": 40,
+        "sage": 40,
+        "state": 0,
+        "pwages": 45000,
+        "swages": 30000,
+        "taxsimid": 11,
+        "idtl": 2,
+        "depx": 2
+    }
 
 
 def test_import_single_household(sample_taxsim_input):
@@ -266,6 +279,74 @@ def test_export_single_household(sample_taxsim_input):
     assert "siitax" in result
     # Note: We can't easily predict the exact tax values without mocking the PolicyEngine simulation,
     # so we're just checking that these keys exist in the output.
+
+def test_joint_household(sample_taxsim_input_for_joint):
+    expected_output_joint_situation = {
+        "families": {
+            "your family": {
+                "members": [
+                    "you",
+                    "your partner"
+                ]
+            }
+        },
+        "households": {
+            "your household": {
+                "members": [
+                    "you",
+                    "your partner"
+                ],
+                "state_name": {
+                    "2023": "TX"
+                }
+            }
+        },
+        "marital_units": {
+            "your marital unit": {
+                "members": [
+                    "you",
+                    "your partner"
+                ]
+            }
+        },
+        "people": {
+            "you": {
+                "age": {
+                    "2023": 40
+                },
+                "employment_income": {
+                    "2023": 45000
+                }
+            },
+            "your partner": {
+                "age": {
+                    "2023": 40
+                },
+                "employment_income": {
+                    "2023": 30000
+                }
+            }
+        },
+        "spm_units": {
+            "your household": {
+                "members": [
+                    "you",
+                    "your partner"
+                ]
+            }
+        },
+        "tax_units": {
+            "your tax unit": {
+                "members": [
+                    "you",
+                    "your partner"
+                ]
+            }
+        }
+    }
+
+    result = generate_household(sample_taxsim_input_for_joint)
+    assert result == expected_output_joint_situation
 
 
 def test_roundtrip(sample_taxsim_input):
