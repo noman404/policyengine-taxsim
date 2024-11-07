@@ -299,8 +299,4 @@ taxsim_to_policyengine:
       your tax unit:
         members: []
 
-  household_type:
-    single_household: ["you"]
-    joint_household: ["you", "your partner"]
-    household_with_dependent: [ "you", "your partner", "your first dependent", "your second dependent","your fourth dependent","your fifth dependent" ]
 
