@@ -96,3 +96,19 @@ def to_roundedup_number(value):
         return round(value[0], 2)
     else:
         return round(value, 2)
+
+def get_ordinal(n):
+    """Convert number to ordinal string."""
+    ordinals = {
+        1: "first",
+        2: "second",
+        3: "third",
+        4: "fourth",
+        5: "fifth",
+        6: "sixth",
+        7: "seventh",
+        8: "eighth",
+        9: "ninth",
+        10: "tenth"
+    }
+    return ordinals.get(n, f"{n}th")

@@ -1,32 +1,52 @@
 from .utils import (
     load_variable_mappings,
-    get_state_code,
+    get_state_code, get_ordinal,
 )
 import copy
 
 
-def form_household_situation(depx, year, state, taxsim_vars):
+def form_household_situation(year, state, taxsim_vars):
     mappings = load_variable_mappings()["taxsim_to_policyengine"]
 
     base_situation = copy.deepcopy(mappings["household_situation"])
 
-    if depx == 1:
-        household_type = "single_household"
-    elif depx == 2:
-        household_type = "joint_household"
+    depx = taxsim_vars["depx"]
+
+    mstat = taxsim_vars["mstat"]
+
+    if mstat == 2:  # Married filing jointly
+        members = ["you", "your partner"]
+    else:  # Single, separate, or dependent taxpayer
+        members = ["you"]
+
+    for i in range(1, depx + 1):
+        age_key = f"age{i}"
+        if age_key in taxsim_vars and taxsim_vars[age_key] > 0:
+            members.append(f"your {get_ordinal(i)} dependent")
+
+    base_situation["families"]["your family"]["members"] = members
+    base_situation["households"]["your household"]["members"] = members
+    base_situation["tax_units"]["your tax unit"]["members"] = members
+    base_situation["spm_units"]["your household"]["members"] = members
+
+    if depx > 0:
+        base_situation["marital_units"] = {
+            "your marital unit": {
+                "members": ["you", "your partner"] if mstat == 2 else ["you"]
+            }
+        }
+        for i in range(1, depx + 1):
+            age_key = f"age{i}"
+            if age_key in taxsim_vars and taxsim_vars[age_key] > 0:
+                dep_name = f"your {get_ordinal(i)} dependent"
+                base_situation["marital_units"][f"{dep_name}'s marital unit"] = {
+                    "members": [dep_name],
+                    "marital_unit_id": {str(year): i}
+                }
     else:
-        household_type = "single_household"
-
-    household_members = mappings["household_type"][household_type]
-
-    base_situation["families"]["your family"]["members"] = household_members
-    base_situation["households"]["your household"]["members"] = household_members
-    base_situation["tax_units"]["your tax unit"]["members"] = household_members
-    base_situation["spm_units"]["your household"]["members"] = household_members
-
-    base_situation["marital_units"]["your marital unit"]["members"] = (
-        ["you", "your partner"] if household_type == "joint_household" else ["you"]
-    )
+        base_situation["marital_units"]["your marital unit"]["members"] = (
+            ["you", "your partner"] if mstat == 2 else ["you"]
+        )
 
     base_situation["households"]["your household"]["state_name"][str(year)] = state
 
@@ -34,16 +54,35 @@ def form_household_situation(depx, year, state, taxsim_vars):
 
     people["you"] = {
         "age": {str(year): int(taxsim_vars.get("page", 40))},
-        "employment_income": {str(year): int(taxsim_vars.get("pwages", 0))}
+        "employment_income": {str(year): float(taxsim_vars.get("pwages", 0))}
     }
 
-    if household_type == "joint_household":
+    if mstat == 2:
         people["your partner"] = {
             "age": {str(year): int(taxsim_vars.get("sage", 40))},
-            "employment_income": {str(year): int(taxsim_vars.get("swages", 0))}
+            "employment_income": {str(year): float(taxsim_vars.get("swages", 0))}
         }
 
+    for i in range(1, depx + 1):
+        age_key = f"age{i}"
+        if age_key in taxsim_vars and taxsim_vars[age_key] > 0:
+            dep_name = f"your {get_ordinal(i)} dependent"
+            people[dep_name] = {
+                "age": {str(year): int(taxsim_vars[age_key])},
+                "employment_income": {str(year): 0}
+            }
+
     return base_situation
+
+def check_if_exists_or_set_defaults(taxsim_vars):
+    taxsim_vars["state"] = int(taxsim_vars.get("state",
+                                           44) or 44)  # set TX (texas) as default is no state field has passed or passed as 0
+
+    taxsim_vars["depx"] = int(taxsim_vars.get("depx", 0) or 0)
+
+    taxsim_vars["mstat"] = int(taxsim_vars.get("mstat", 1) or 1)
+
+    return taxsim_vars
 
 
 def generate_household(taxsim_vars):
@@ -59,12 +98,10 @@ def generate_household(taxsim_vars):
 
     year = str(int(taxsim_vars["year"]))  # Ensure year is an integer string
 
-    taxsim_vars["state"] = taxsim_vars.get("state",
-                                           44) or 44  # set TX texas as default is no state has passed or passed as 0
+    taxsim_vars = check_if_exists_or_set_defaults(taxsim_vars)
+
     state = get_state_code(taxsim_vars["state"])
 
-    taxsim_vars["depx"] = taxsim_vars.get("depx", 1) or 1
-
-    situation = form_household_situation(taxsim_vars["depx"], year, state, taxsim_vars)
+    situation = form_household_situation(year, state, taxsim_vars)
 
     return situation
