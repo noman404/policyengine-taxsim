@@ -67,6 +67,8 @@ def sample_taxsim_input_for_household_with_dependent():
         "depx": 2,
         "age1": 4
     }
+
+
 @pytest.fixture
 def sample_taxsim_input_for_household_with_dependent_single_parent():
     return {
@@ -398,17 +400,22 @@ def test_household_with_dependent(sample_taxsim_input_for_household_with_depende
     result = generate_household(sample_taxsim_input_for_household_with_dependent)
     assert result == expected_output
 
+
 def test_household_with_dependent_single_parent(sample_taxsim_input_for_household_with_dependent_single_parent):
     expected_output = {
-    'families': {'your family': {'members': ['you', 'your first dependent']}},
-    'households': {'your household': {'members': ['you', 'your first dependent'], 'state_name': {'2023': 'PA'}}},
-    'marital_units': {'your marital unit': {'members': ['you']}, "your first dependent's marital unit": {'members': ['your first dependent'], 'marital_unit_id': {'2023': 1}}},
-    'people': {'you': {'age': {'2023': 40}, 'employment_income': {'2023': 81000.001}}, 'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}}},
-    'spm_units': {'your household': {'members': ['you', 'your first dependent']}},
-    'tax_units': {'your tax unit': {'members': ['you', 'your first dependent']}}}
+        'families': {'your family': {'members': ['you', 'your first dependent']}},
+        'households': {'your household': {'members': ['you', 'your first dependent'], 'state_name': {'2023': 'PA'}}},
+        'marital_units': {'your marital unit': {'members': ['you']},
+                          "your first dependent's marital unit": {'members': ['your first dependent'],
+                                                                  'marital_unit_id': {'2023': 1}}},
+        'people': {'you': {'age': {'2023': 40}, 'employment_income': {'2023': 81000.001}},
+                   'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}}},
+        'spm_units': {'your household': {'members': ['you', 'your first dependent']}},
+        'tax_units': {'your tax unit': {'members': ['you', 'your first dependent']}}}
 
     result = generate_household(sample_taxsim_input_for_household_with_dependent_single_parent)
     assert result == expected_output
+
 
 def test_roundtrip(sample_taxsim_input):
     # Import TAXSIM input to PolicyEngine situation

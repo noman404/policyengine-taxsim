@@ -85,21 +85,7 @@ class E2ETest(unittest.TestCase):
         if self.input_file_single_household.exists():
             print(f"Input File is Readable: {os.access(self.input_file_single_household, os.R_OK)}")
 
-    def test_generate_policyengine_taxsim_single_household_output(self):
-        output_file = self.output_dir / self.SINGLE_HOUSEHOLD_PE_TAXSIM_OUTPUT
-
-        # Use list form and absolute paths
-        cmd = [
-            sys.executable,
-            str(self.cli_path.absolute()),
-            str(self.input_file_single_household.absolute()),
-            "-o",
-            str(output_file.absolute())
-        ]
-
-        # Print command for debugging
-        print(f"Running command: {' '.join(cmd)}")
-
+    def generate_pe_taxsim_output(self, cmd):
         creation_flags = 0
         if platform.system().lower() == "windows":
             if hasattr(subprocess, 'CREATE_NO_WINDOW'):
@@ -108,7 +94,6 @@ class E2ETest(unittest.TestCase):
                 # For Python < 3.11 on Windows
                 # DETACHED_PROCESS = 0x00000008
                 creation_flags = 0x00000008
-
         process = subprocess.run(
             cmd,
             shell=False,
@@ -116,7 +101,6 @@ class E2ETest(unittest.TestCase):
             text=True,
             creationflags=creation_flags
         )
-
         print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
         if process.returncode != 0:
             print(
@@ -126,16 +110,10 @@ class E2ETest(unittest.TestCase):
                 f"PolicyEngine TAXSIM CLI failed: {process.returncode}"
             )
 
-        self.assertTrue(output_file.is_file())
-        print(f"Content of {output_file}:")
-        with open(output_file, "r") as f:
-            print(f.read())
-
-    def test_generate_taxsim35_single_household_output(self):
+    def generate_taxsim35_output(self, taxsim35_input_file, output_file):
         import tempfile
         import shutil
 
-        output_file = self.output_dir / self.SINGLE_HOUSEHOLD_TAXSIM35_OUTPUT
         taxsim_path = self.taxsim_dir / self.taxsim_exe
 
         # Create a temporary directory for execution
@@ -145,7 +123,7 @@ class E2ETest(unittest.TestCase):
             temp_input = Path(temp_dir) / "input.csv"
 
             shutil.copy2(taxsim_path, temp_exe)
-            shutil.copy2(self.input_file_single_household, temp_input)
+            shutil.copy2(taxsim35_input_file, temp_input)
 
             if platform.system().lower() != "windows":
                 os.chmod(temp_exe, 0o755)
@@ -176,10 +154,38 @@ class E2ETest(unittest.TestCase):
                 print(f"TAXSIM35 failed with error:\n{process.stderr}")
                 raise Exception(f"TAXSIM35 failed: {process.returncode}")
 
-            self.assertTrue(output_file.is_file())
-            print(f"Content of {output_file}:")
-            with open(output_file, "r") as f:
-                print(f.read())
+    def test_generate_policyengine_taxsim_single_household_output(self):
+        output_file = self.output_dir / self.SINGLE_HOUSEHOLD_PE_TAXSIM_OUTPUT
+
+        # Use list form and absolute paths
+        cmd = [
+            sys.executable,
+            str(self.cli_path.absolute()),
+            str(self.input_file_single_household.absolute()),
+            "-o",
+            str(output_file.absolute())
+        ]
+
+        # Print command for debugging
+        print(f"Running command: {' '.join(cmd)}")
+
+        self.generate_pe_taxsim_output(cmd)
+
+        self.assertTrue(output_file.is_file())
+        print(f"Content of {output_file}:")
+        with open(output_file, "r") as f:
+            print(f.read())
+
+    def test_generate_taxsim35_single_household_output(self):
+
+        output_file = self.output_dir / self.SINGLE_HOUSEHOLD_TAXSIM35_OUTPUT
+
+        self.generate_taxsim35_output(self.input_file_single_household, output_file)
+
+        self.assertTrue(output_file.is_file())
+        print(f"Content of {output_file}:")
+        with open(output_file, "r") as f:
+            print(f.read())
 
     def test_match_single_household_output(self):
         taxsim35_csv = pd.read_csv(self.output_dir / self.SINGLE_HOUSEHOLD_TAXSIM35_OUTPUT)
@@ -275,31 +281,7 @@ class E2ETest(unittest.TestCase):
         # Print command for debugging
         print(f"Running command: {' '.join(cmd)}")
 
-        creation_flags = 0
-        if platform.system().lower() == "windows":
-            if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                creation_flags = subprocess.CREATE_NO_WINDOW
-            else:
-                # For Python < 3.11 on Windows
-                # DETACHED_PROCESS = 0x00000008
-                creation_flags = 0x00000008
-
-        process = subprocess.run(
-            cmd,
-            shell=False,
-            capture_output=True,
-            text=True,
-            creationflags=creation_flags
-        )
-
-        print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
-        if process.returncode != 0:
-            print(
-                f"PolicyEngine TAXSIM CLI failed with error:\n{process.stderr}"
-            )
-            raise Exception(
-                f"PolicyEngine TAXSIM CLI failed: {process.returncode}"
-            )
+        self.generate_pe_taxsim_output(cmd)
 
         self.assertTrue(output_file.is_file())
         print(f"Content of {output_file}:")
@@ -307,54 +289,14 @@ class E2ETest(unittest.TestCase):
             print(f.read())
 
     def test_generate_taxsim35_joint_household_output(self):
-        import tempfile
-        import shutil
 
         output_file = self.output_dir / self.JOINT_HOUSEHOLD_TAXSIM35_OUTPUT
-        taxsim_path = self.taxsim_dir / self.taxsim_exe
+        self.generate_taxsim35_output(self.input_file_joint_household, output_file)
 
-        # Create a temporary directory for execution
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Copy executable and input to temp directory
-            temp_exe = Path(temp_dir) / self.taxsim_exe
-            temp_input = Path(temp_dir) / "input.csv"
-
-            shutil.copy2(taxsim_path, temp_exe)
-            shutil.copy2(self.input_file_joint_household, temp_input)
-
-            if platform.system().lower() != "windows":
-                os.chmod(temp_exe, 0o755)
-                cmd = f'cat "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}"'
-            else:
-                # Windows specific handling
-                cmd = f'cmd.exe /c "type "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}""'
-
-            creation_flags = 0
-            if platform.system().lower() == "windows":
-                if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                    creation_flags = subprocess.CREATE_NO_WINDOW
-                else:
-                    # For Python < 3.11 on Windows
-                    # DETACHED_PROCESS = 0x00000008
-                    creation_flags = 0x00000008
-
-            process = subprocess.run(
-                cmd,
-                shell=True,
-                capture_output=True,
-                text=True,
-                creationflags=creation_flags if platform.system().lower() == "windows" else 0
-            )
-
-            print(f"TAXSIM35 output:\n{process.stdout}")
-            if process.returncode != 0:
-                print(f"TAXSIM35 failed with error:\n{process.stderr}")
-                raise Exception(f"TAXSIM35 failed: {process.returncode}")
-
-            self.assertTrue(output_file.is_file())
-            print(f"Content of {output_file}:")
-            with open(output_file, "r") as f:
-                print(f.read())
+        self.assertTrue(output_file.is_file())
+        print(f"Content of {output_file}:")
+        with open(output_file, "r") as f:
+            print(f.read())
 
     def test_match_joint_household_output(self):
         taxsim35_csv = pd.read_csv(self.output_dir / self.JOINT_HOUSEHOLD_TAXSIM35_OUTPUT)
@@ -450,31 +392,7 @@ class E2ETest(unittest.TestCase):
         # Print command for debugging
         print(f"Running command: {' '.join(cmd)}")
 
-        creation_flags = 0
-        if platform.system().lower() == "windows":
-            if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                creation_flags = subprocess.CREATE_NO_WINDOW
-            else:
-                # For Python < 3.11 on Windows
-                # DETACHED_PROCESS = 0x00000008
-                creation_flags = 0x00000008
-
-        process = subprocess.run(
-            cmd,
-            shell=False,
-            capture_output=True,
-            text=True,
-            creationflags=creation_flags
-        )
-
-        print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
-        if process.returncode != 0:
-            print(
-                f"PolicyEngine TAXSIM CLI failed with error:\n{process.stderr}"
-            )
-            raise Exception(
-                f"PolicyEngine TAXSIM CLI failed: {process.returncode}"
-            )
+        self.generate_pe_taxsim_output(cmd)
 
         self.assertTrue(output_file.is_file())
         print(f"Content of {output_file}:")
@@ -482,54 +400,13 @@ class E2ETest(unittest.TestCase):
             print(f.read())
 
     def test_generate_taxsim35_household_with_dependent_output(self):
-        import tempfile
-        import shutil
-
         output_file = self.output_dir / self.HOUSEHOLD_WITH_DEPENDENT_TAXSIM35_OUTPUT
-        taxsim_path = self.taxsim_dir / self.taxsim_exe
+        self.generate_taxsim35_output(self.input_file_household_with_dependent, output_file)
 
-        # Create a temporary directory for execution
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Copy executable and input to temp directory
-            temp_exe = Path(temp_dir) / self.taxsim_exe
-            temp_input = Path(temp_dir) / "input.csv"
-
-            shutil.copy2(taxsim_path, temp_exe)
-            shutil.copy2(self.input_file_household_with_dependent, temp_input)
-
-            if platform.system().lower() != "windows":
-                os.chmod(temp_exe, 0o755)
-                cmd = f'cat "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}"'
-            else:
-                # Windows specific handling
-                cmd = f'cmd.exe /c "type "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}""'
-
-            creation_flags = 0
-            if platform.system().lower() == "windows":
-                if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                    creation_flags = subprocess.CREATE_NO_WINDOW
-                else:
-                    # For Python < 3.11 on Windows
-                    # DETACHED_PROCESS = 0x00000008
-                    creation_flags = 0x00000008
-
-            process = subprocess.run(
-                cmd,
-                shell=True,
-                capture_output=True,
-                text=True,
-                creationflags=creation_flags if platform.system().lower() == "windows" else 0
-            )
-
-            print(f"TAXSIM35 output:\n{process.stdout}")
-            if process.returncode != 0:
-                print(f"TAXSIM35 failed with error:\n{process.stderr}")
-                raise Exception(f"TAXSIM35 failed: {process.returncode}")
-
-            self.assertTrue(output_file.is_file())
-            print(f"Content of {output_file}:")
-            with open(output_file, "r") as f:
-                print(f.read())
+        self.assertTrue(output_file.is_file())
+        print(f"Content of {output_file}:")
+        with open(output_file, "r") as f:
+            print(f.read())
 
     def test_match_household_with_dependent_output(self):
         taxsim35_csv = pd.read_csv(self.output_dir / self.HOUSEHOLD_WITH_DEPENDENT_TAXSIM35_OUTPUT)
@@ -625,31 +502,7 @@ class E2ETest(unittest.TestCase):
         # Print command for debugging
         print(f"Running command: {' '.join(cmd)}")
 
-        creation_flags = 0
-        if platform.system().lower() == "windows":
-            if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                creation_flags = subprocess.CREATE_NO_WINDOW
-            else:
-                # For Python < 3.11 on Windows
-                # DETACHED_PROCESS = 0x00000008
-                creation_flags = 0x00000008
-
-        process = subprocess.run(
-            cmd,
-            shell=False,
-            capture_output=True,
-            text=True,
-            creationflags=creation_flags
-        )
-
-        print(f"PolicyEngine TAXSIM CLI output:\n{process.stdout}")
-        if process.returncode != 0:
-            print(
-                f"PolicyEngine TAXSIM CLI failed with error:\n{process.stderr}"
-            )
-            raise Exception(
-                f"PolicyEngine TAXSIM CLI failed: {process.returncode}"
-            )
+        self.generate_pe_taxsim_output(cmd)
 
         self.assertTrue(output_file.is_file())
         print(f"Content of {output_file}:")
@@ -657,54 +510,12 @@ class E2ETest(unittest.TestCase):
             print(f.read())
 
     def test_generate_taxsim35_household_with_dependent_single_parent_output(self):
-        import tempfile
-        import shutil
-
         output_file = self.output_dir / self.HOUSEHOLD_WITH_DEPENDENT_SINGLE_PARENT_TAXSIM35_OUTPUT
-        taxsim_path = self.taxsim_dir / self.taxsim_exe
-
-        # Create a temporary directory for execution
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Copy executable and input to temp directory
-            temp_exe = Path(temp_dir) / self.taxsim_exe
-            temp_input = Path(temp_dir) / "input.csv"
-
-            shutil.copy2(taxsim_path, temp_exe)
-            shutil.copy2(self.input_file_household_with_dependent_single_parent, temp_input)
-
-            if platform.system().lower() != "windows":
-                os.chmod(temp_exe, 0o755)
-                cmd = f'cat "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}"'
-            else:
-                # Windows specific handling
-                cmd = f'cmd.exe /c "type "{str(temp_input)}" | "{str(temp_exe)}" > "{str(output_file)}""'
-
-            creation_flags = 0
-            if platform.system().lower() == "windows":
-                if hasattr(subprocess, 'CREATE_NO_WINDOW'):
-                    creation_flags = subprocess.CREATE_NO_WINDOW
-                else:
-                    # For Python < 3.11 on Windows
-                    # DETACHED_PROCESS = 0x00000008
-                    creation_flags = 0x00000008
-
-            process = subprocess.run(
-                cmd,
-                shell=True,
-                capture_output=True,
-                text=True,
-                creationflags=creation_flags if platform.system().lower() == "windows" else 0
-            )
-
-            print(f"TAXSIM35 output:\n{process.stdout}")
-            if process.returncode != 0:
-                print(f"TAXSIM35 failed with error:\n{process.stderr}")
-                raise Exception(f"TAXSIM35 failed: {process.returncode}")
-
-            self.assertTrue(output_file.is_file())
-            print(f"Content of {output_file}:")
-            with open(output_file, "r") as f:
-                print(f.read())
+        self.generate_taxsim35_output(self.input_file_household_with_dependent_single_parent, output_file)
+        self.assertTrue(output_file.is_file())
+        print(f"Content of {output_file}:")
+        with open(output_file, "r") as f:
+            print(f.read())
 
     def test_match_household_with_dependent_single_parent_output(self):
         taxsim35_csv = pd.read_csv(self.output_dir / self.HOUSEHOLD_WITH_DEPENDENT_SINGLE_PARENT_TAXSIM35_OUTPUT)
@@ -783,7 +594,7 @@ class E2ETest(unittest.TestCase):
         # Assert all columns match
         all_matched = all(comparison_results.values())
         self.assertTrue(all_matched,
-                        f"Columns with missmatches: {[col for col, matched in comparison_results.items() if not matched]}")
+                        f"Columns with mismatches: {[col for col, matched in comparison_results.items() if not matched]}")
 
 
 if __name__ == "__main__":
