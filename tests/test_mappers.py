@@ -305,97 +305,61 @@ def test_export_single_household(sample_taxsim_input):
     }
 
     result = export_household(sample_taxsim_input, policyengine_single_household_situation)
-    print(result)
     assert result["year"] == 2021
     assert result["state"] == 3
     assert "fiitax" in result
     assert "siitax" in result
-    # Note: We can't easily predict the exact tax values without mocking the PolicyEngine simulation,
-    # so we're just checking that these keys exist in the output.
 
 
 def test_joint_household(sample_taxsim_input_for_joint):
-    expected_output_joint_situation = {
-        "families": {
-            "your family": {
-                "members": [
-                    "you",
-                    "your partner"
-                ]
-            }
-        },
-        "households": {
-            "your household": {
-                "members": [
-                    "you",
-                    "your partner"
-                ],
-                "state_name": {
-                    "2023": "TX"
-                }
-            }
-        },
-        "marital_units": {
-            "your marital unit": {
-                "members": [
-                    "you",
-                    "your partner"
-                ]
-            }
-        },
-        "people": {
-            "you": {
-                "age": {
-                    "2023": 40
-                },
-                "employment_income": {
-                    "2023": 45000.0
-                }
-            },
-            "your partner": {
-                "age": {
-                    "2023": 40
-                },
-                "employment_income": {
-                    "2023": 30000.0
-                }
-            }
-        },
-        "spm_units": {
-            "your household": {
-                "members": [
-                    "you",
-                    "your partner"
-                ]
-            }
-        },
-        "tax_units": {
-            "your tax unit": {
-                "members": [
-                    "you",
-                    "your partner"
-                ]
-            }
-        }
-    }
+    expected_output_joint_situation = {'families': {
+        'your family': {'members': ['you', 'your partner', 'your first dependent', 'your second dependent']}},
+        'households': {'your household': {
+            'members': ['you', 'your partner', 'your first dependent',
+                        'your second dependent'], 'state_name': {'2023': 'TX'}}},
+        'marital_units': {'your marital unit': {'members': ['you', 'your partner']},
+                          "your first dependent's marital unit": {
+                              'members': ['your first dependent'],
+                              'marital_unit_id': {'2023': 1}},
+                          "your second dependent's marital unit": {
+                              'members': ['your second dependent'],
+                              'marital_unit_id': {'2023': 2}}},
+        'people': {'you': {'age': {'2023': 40}, 'employment_income': {'2023': 45000.0}},
+                   'your partner': {'age': {'2023': 40},
+                                    'employment_income': {'2023': 30000.0}},
+                   'your first dependent': {'age': {'2023': 10},
+                                            'employment_income': {'2023': 0}},
+                   'your second dependent': {'age': {'2023': 10},
+                                             'employment_income': {'2023': 0}}},
+        'spm_units': {'your household': {
+            'members': ['you', 'your partner', 'your first dependent',
+                        'your second dependent']}}, 'tax_units': {
+            'your tax unit': {'members': ['you', 'your partner', 'your first dependent', 'your second dependent']}}}
 
     result = generate_household(sample_taxsim_input_for_joint)
     assert result == expected_output_joint_situation
 
 
 def test_household_with_dependent(sample_taxsim_input_for_household_with_dependent):
-    expected_output = {
-        'families': {'your family': {'members': ['you', 'your partner', 'your first dependent']}},
-        'households': {'your household': {'members': ['you', 'your partner', 'your first dependent'],
-                                          'state_name': {'2023': 'PA'}}},
-        'marital_units': {'your marital unit': {'members': ['you', 'your partner']},
+    expected_output = {'families': {
+        'your family': {'members': ['you', 'your partner', 'your first dependent', 'your second dependent']}},
+        'households': {'your household': {'members':
+                                              ['you', 'your partner', 'your first dependent',
+                                               'your second dependent'], 'state_name': {'2023': 'PA'}}},
+        'marital_units': {'your marital unit': {'members': ['you',
+                                                            'your partner']},
                           "your first dependent's marital unit": {'members': ['your first dependent'],
-                                                                  'marital_unit_id': {'2023': 1}}},
+                                                                  'marital_unit_id': {'2023': 1}},
+                          "your second dependent's marital unit": {'members': ['your second dependent'],
+                                                                   'marital_unit_id': {'2023': 2}}},
         'people': {'you': {'age': {'2023': 40}, 'employment_income': {'2023': 81000.001}},
                    'your partner': {'age': {'2023': 40}, 'employment_income': {'2023': 0.0}},
-                   'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}}},
-        'spm_units': {'your household': {'members': ['you', 'your partner', 'your first dependent']}},
-        'tax_units': {'your tax unit': {'members': ['you', 'your partner', 'your first dependent']}}}
+                   'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}},
+                   'your second dependent': {'age': {'2023': 10}, 'employment_income': {'2023': 0}}},
+        'spm_units': {'your household': {
+            'members': ['you', 'your partner', 'your first dependent', 'your second dependent']}},
+        'tax_units': {'your tax unit': {
+            'members': ['you', 'your partner', 'your first dependent', 'your second dependent']}}}
 
     result = generate_household(sample_taxsim_input_for_household_with_dependent)
     assert result == expected_output
@@ -403,15 +367,19 @@ def test_household_with_dependent(sample_taxsim_input_for_household_with_depende
 
 def test_household_with_dependent_single_parent(sample_taxsim_input_for_household_with_dependent_single_parent):
     expected_output = {
-        'families': {'your family': {'members': ['you', 'your first dependent']}},
-        'households': {'your household': {'members': ['you', 'your first dependent'], 'state_name': {'2023': 'PA'}}},
+        'families': {'your family': {'members': ['you', 'your first dependent', 'your second dependent']}},
+        'households': {'your household': {'members': ['you', 'your first dependent', 'your second dependent'],
+                                          'state_name': {'2023': 'PA'}}},
         'marital_units': {'your marital unit': {'members': ['you']},
                           "your first dependent's marital unit": {'members': ['your first dependent'],
-                                                                  'marital_unit_id': {'2023': 1}}},
+                                                                  'marital_unit_id': {'2023': 1}},
+                          "your second dependent's marital unit": {'members': ['your second dependent'],
+                                                                   'marital_unit_id': {'2023': 2}}},
         'people': {'you': {'age': {'2023': 40}, 'employment_income': {'2023': 81000.001}},
-                   'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}}},
-        'spm_units': {'your household': {'members': ['you', 'your first dependent']}},
-        'tax_units': {'your tax unit': {'members': ['you', 'your first dependent']}}}
+                   'your first dependent': {'age': {'2023': 4}, 'employment_income': {'2023': 0}},
+                   'your second dependent': {'age': {'2023': 10}, 'employment_income': {'2023': 0}}},
+        'spm_units': {'your household': {'members': ['you', 'your first dependent', 'your second dependent']}},
+        'tax_units': {'your tax unit': {'members': ['you', 'your first dependent', 'your second dependent']}}}
 
     result = generate_household(sample_taxsim_input_for_household_with_dependent_single_parent)
     assert result == expected_output

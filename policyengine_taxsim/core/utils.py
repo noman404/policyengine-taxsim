@@ -97,8 +97,8 @@ def to_roundedup_number(value):
     else:
         return round(value, 2)
 
+
 def get_ordinal(n):
-    """Convert number to ordinal string."""
     ordinals = {
         1: "first",
         2: "second",
