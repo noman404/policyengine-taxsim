@@ -5,7 +5,7 @@ from .utils import (
 from policyengine_us import Simulation
 
 
-def export_single_household(taxsim_input, policyengine_situation):
+def export_household(taxsim_input, policyengine_situation):
     """
     Convert a PolicyEngine situation to TAXSIM output variables.
 
@@ -16,7 +16,7 @@ def export_single_household(taxsim_input, policyengine_situation):
         dict: Dictionary of TAXSIM output variables
     """
     mappings = load_variable_mappings()["policyengine_to_taxsim"]
-
+    print(policyengine_situation)
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(
@@ -39,6 +39,9 @@ def export_single_household(taxsim_input, policyengine_situation):
                 taxsim_output[key] = int(year)
             elif key == "state":
                 taxsim_output[key] = get_state_number(state_name)
+            elif key == "fica":
+                pe_variables = value['variables']
+                taxsim_output[key] = simulate_multiple(simulation, pe_variables, year)
             else:
                 pe_variable = value['variable']
 
@@ -57,3 +60,11 @@ def simulate(simulation, variable, year):
         return to_roundedup_number(simulation.calculate(variable, period=year))
     except:
         return 0.00
+
+
+def simulate_multiple(simulation, variables, year):
+    try:
+        total = sum(to_roundedup_number(simulation.calculate(variable, period=year)) for variable in variables)
+    except:
+        total = 0.00
+    return to_roundedup_number(total)

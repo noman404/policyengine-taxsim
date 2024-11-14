@@ -28,12 +28,16 @@ policyengine_to_taxsim:
      - full: 2
      - full_text: 5
   fica:
-    variable: employee_social_security_tax
+    variable: use_placeholder_for_now_until_its_implemented_in_PE
     implemented: true
     idtl:
      - standard : 0
      - full: 2
      - full_text: 5
+    variables:
+      - employee_social_security_tax
+      - employee_medicare_tax
+      - additional_medicare_tax
   frate:
     variable: not_implemented_in_pe
     implemented: false
@@ -63,7 +67,7 @@ policyengine_to_taxsim:
      - full: 2
      - full_text: 5
   v10:
-    variable: state_agi
+    variable: adjusted_gross_income
     implemented: true
     idtl:
      - full: 2
@@ -105,7 +109,7 @@ policyengine_to_taxsim:
      - full: 2
      - full_text: 5
   v17:
-    variable: taxable_income_deductions
+    variable: taxable_income_deductions_if_itemizing
     implemented: true
     idtl:
      - full: 2
@@ -280,6 +284,23 @@ policyengine_to_taxsim:
      - full_text: 5
 
 taxsim_to_policyengine:
-  # This section would be the inverse of the above mapping
-  # It's left empty for brevity, but you should populate it
-  # with the inverse relationships for bidirectional conversion
+  household_situation:
+    families:
+      your family:
+        members: []
+    households:
+      your household:
+        members: []
+        state_name: {}
+    marital_units:
+      your marital unit:
+        members: []
+    people: {}
+    spm_units:
+      your household:
+        members: []
+    tax_units:
+      your tax unit:
+        members: []
+
+
