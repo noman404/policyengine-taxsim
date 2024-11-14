@@ -67,4 +67,4 @@ def simulate_multiple(simulation, variables, year):
         total = sum(to_roundedup_number(simulation.calculate(variable, period=year)) for variable in variables)
     except:
         total = 0.00
-    return total
+    return to_roundedup_number(total)

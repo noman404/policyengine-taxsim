@@ -67,7 +67,7 @@ policyengine_to_taxsim:
      - full: 2
      - full_text: 5
   v10:
-    variable: state_agi
+    variable: adjusted_gross_income
     implemented: true
     idtl:
      - full: 2
