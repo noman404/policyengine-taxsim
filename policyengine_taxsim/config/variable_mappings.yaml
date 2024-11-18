@@ -6,8 +6,8 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 2. Year
-    full_text_group: Basic Output
+    text_description: "2. Year"
+    full_text_group: "Basic Output"
   state:
     variable: get_state_code
     implemented: true
@@ -15,8 +15,8 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 3. State (SOI code)
-    full_text_group: Basic Output
+    text_description: "3. State (SOI code)"
+    full_text_group: "Basic Output"
   fiitax:
     variable: income_tax
     implemented: true
@@ -24,8 +24,8 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-  text_description: 4. Federal IIT Liability
-  full_text_group: Basic Output
+    text_description: "4. Federal IIT Liability"
+    full_text_group: "Basic Output"
   siitax:
     variable: state_income_tax
     implemented: true
@@ -33,8 +33,8 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 5. State IIT Liability
-    full_text_group: Basic Output
+    text_description: "5. State IIT Liability"
+    full_text_group: "Basic Output"
   fica:
     variable: use_placeholder_for_now_until_its_implemented_in_PE
     implemented: true
@@ -46,8 +46,8 @@ policyengine_to_taxsim:
       - employee_social_security_tax
       - employee_medicare_tax
       - additional_medicare_tax
-    text_description: 6. SS Payroll Tax Liability \nMarginal Rates wrt Weighted Average Earnings
-    full_text_group: Basic Output
+    text_description: "6. SS Payroll Tax Liability \nMarginal Rates wrt Weighted Average Earnings"
+    full_text_group: "Basic Output"
   frate:
     variable: not_implemented_in_pe
     implemented: false
@@ -55,8 +55,8 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 7. Federal Marginal Rate
-    full_text_group: Basic Output
+    text_description: "7. Federal Marginal Rate"
+    full_text_group: "Basic Output"
   srate:
     variable: not_implemented_in_pe
     implemented: false
@@ -64,16 +64,16 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 8. State Marginal Rate
-    full_text_group: Basic Output
+    text_description: "8. State Marginal Rate"
+    full_text_group: "Basic Output"
   ficar:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - standard : 0
      - full: 2
-    text_description: Not available in taxsim full text description
-    full_text_group: Basic Output
+    text_description: "Not available in taxsim full text description"
+    full_text_group: "Basic Output"
   tfica:
     variable: taxsim_tfica
     implemented: true
@@ -81,295 +81,295 @@ policyengine_to_taxsim:
      - standard : 0
      - full: 2
      - full_text: 5
-    text_description: 9. Weighted Payroll Tax Rate
-    full_text_group: Basic Output
+    text_description: "9. Weighted Payroll Tax Rate"
+    full_text_group: "Basic Output"
   v10:
     variable: adjusted_gross_income
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 10. Federal AGI
-    full_text_group: Federal Tax Calculation
+    text_description: "10. Federal AGI"
+    full_text_group: "Federal Tax Calculation"
   v11:
     variable: tax_unit_taxable_unemployment_compensation
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 11. UI in AGI 1979+
-    full_text_group: Federal Tax Calculation
+    text_description: "11. UI in AGI 1979+"
+    full_text_group: "Federal Tax Calculation"
   v12:
     variable: tax_unit_taxable_social_security
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 12. Social Security in AGI 84
-    full_text_group: Federal Tax Calculation
+    text_description: "12. Social Security in AGI 84"
+    full_text_group: "Federal Tax Calculation"
   v13:
     variable: basic_standard_deduction
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 13. Zero Bracket Amount
-    full_text_group: Federal Tax Calculation
+    text_description: "13. Zero Bracket Amount"
+    full_text_group: "Federal Tax Calculation"
   v14:
     variable: exemptions
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 14. Personal Exemptions
-    full_text_group: Federal Tax Calculation
+    text_description: "14. Personal Exemptions"
+    full_text_group: "Federal Tax Calculation"
   v15:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 15. Exemption Phaseout 1991+
-    full_text_group: Federal Tax Calculation
+    text_description: "15. Exemption Phaseout 1991+"
+    full_text_group: "Federal Tax Calculation"
   v16:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 16. Deduction Phaseout 1991+
-    full_text_group: Federal Tax Calculation
+    text_description: "16. Deduction Phaseout 1991+"
+    full_text_group: "Federal Tax Calculation"
   v17:
     variable: taxable_income_deductions_if_itemizing
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 17. Deductions allowed \nQBI deduction
-    full_text_group: Federal Tax Calculation
+    text_description: "17. Deductions allowed \nQBI deduction"
+    full_text_group: "Federal Tax Calculation"
   v18:
     variable: taxable_income
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 18. Federal Taxable Income
-    full_text_group: Federal Tax Calculation
+    text_description: "18. Federal Taxable Income"
+    full_text_group: "Federal Tax Calculation"
   v19:
     variable: income_tax_before_credits
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 19. Federal Regular Tax
-    full_text_group: Federal Tax Calculation
+    text_description: "19. Federal Regular Tax"
+    full_text_group: "Federal Tax Calculation"
   v20:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 20. Exemption Surtax 1988-96
-    full_text_group: Federal Tax Calculation
+    text_description: "20. Exemption Surtax 1988-96"
+    full_text_group: "Federal Tax Calculation"
   v21:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 21. General Tax Credit 1975-8
-    full_text_group: Federal Tax Calculation
+    text_description: "21. General Tax Credit 1975-8"
+    full_text_group: "Federal Tax Calculation"
   v22:
     variable: ctc
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 22. Child Tax Credit*17/22 98
-    full_text_group: Federal Tax Calculation
+    text_description: "22. Child Tax Credit*17/22 98"
+    full_text_group: "Federal Tax Calculation"
   v23:
     variable: refundable_ctc
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 23. Refundable Part
-    full_text_group: Federal Tax Calculation
+    text_description: "23. Refundable Part"
+    full_text_group: "Federal Tax Calculation"
   v24:
     variable: cdcc
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 24. Child Care Credit 1076+
-    full_text_group: Federal Tax Calculation
+    text_description: "24. Child Care Credit 1076+"
+    full_text_group: "Federal Tax Calculation"
   v25:
     variable: eitc
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 25. Earned Income Credit 1975
-    full_text_group: Federal Tax Calculation
+    text_description: "25. Earned Income Credit 1975"
+    full_text_group: "Federal Tax Calculation"
   v26:
     variable: amt_income
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 26. Alternative Min Income
-    full_text_group: Federal Tax Calculation
+    text_description: "26. Alternative Min Income"
+    full_text_group: "Federal Tax Calculation"
   v27:
     variable: alternative_minimum_tax
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 27. AMT
-    full_text_group: Federal Tax Calculation
+    text_description: "27. AMT"
+    full_text_group: "Federal Tax Calculation"
   v28:
     variable: income_tax_before_refundable_credits
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 28. Income Tax Before Credits \nTotal Credits
-    full_text_group: Federal Tax Calculation
+    text_description: "28. Income Tax Before Credits \nTotal Credits"
+    full_text_group: "Federal Tax Calculation"
   v29:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 29. FICA \nTaxpayer share of FICA
-    full_text_group: Federal Tax Calculation
+    text_description: "29. FICA \nTaxpayer share of FICA"
+    full_text_group: "Federal Tax Calculation"
   v30:
     variable: household_net_income
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 30. Household Income
-    full_text_group: State Tax Calculation
+    text_description: "30. Household Income"
+    full_text_group: "State Tax Calculation"
   v31:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 31. Imputed Rent
-    full_text_group: State Tax Calculation
+    text_description: "31. Imputed Rent"
+    full_text_group: "State Tax Calculation"
   v32:
     variable: state_agi
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 32. AGI
-    full_text_group: State Tax Calculation
+    text_description: "32. AGI"
+    full_text_group: "State Tax Calculation"
   v33:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 33. Exemptions
-    full_text_group: State Tax Calculation
+    text_description: "33. Exemptions"
+    full_text_group: "State Tax Calculation"
   v34:
     variable: state_standard_deduction
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 34. Standard Deduction
-    full_text_group: State Tax Calculation
+    text_description: "34. Standard Deduction"
+    full_text_group: "State Tax Calculation"
   v35:
     variable: state_itemized_deductions
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 35. Itemized Deductions
-    full_text_group: State Tax Calculation
+    text_description: "35. Itemized Deductions"
+    full_text_group: "State Tax Calculation"
   v36:
     variable: state_taxable_income
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 36. Taxable Income \nTax before credits
-    full_text_group: State Tax Calculation
+    text_description: "36. Taxable Income \nTax before credits"
+    full_text_group: "State Tax Calculation"
   v37:
     variable: state_property_tax_credit
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 37. Property Tax Credit
-    full_text_group: State Tax Calculation
+    text_description: "37. Property Tax Credit"
+    full_text_group: "State Tax Calculation"
   v38:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 38. Child Care Credit
-    full_text_group: State Tax Calculation
+    text_description: "38. Child Care Credit"
+    full_text_group: "State Tax Calculation"
   v39:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 39. EIC \nEnergy|Fuel Credit \nChild Tax Credit
-    full_text_group: State Tax Calculation
+    text_description: "39. EIC \nEnergy|Fuel Credit \nChild Tax Credit"
+    full_text_group: "State Tax Calculation"
   v40:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 40. Total Credits
-    full_text_group: State Tax Calculation
+    text_description: "40. Total Credits"
+    full_text_group: "State Tax Calculation"
   v41:
     variable: not_implemented_in_pe
     implemented: false
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 41. Bracket Rate \nState Tax after Credits
-    full_text_group: State Tax Calculation
+    text_description: "41. Bracket Rate \nState Tax after Credits"
+    full_text_group: "State Tax Calculation"
   v42:
     variable: self_employment_income
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: 42. QBI Deduction
-    full_text_group: State Tax Calculation
+    text_description: "42. QBI Deduction"
+    full_text_group: "State Tax Calculation"
   v43:
     variable: net_investment_income_tax
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: Medicare tax on Unearned Income
-    full_text_group: Regular Income Tax
+    text_description: "Medicare tax on Unearned Income"
+    full_text_group: "Regular Income Tax"
   v44:
     variable: employee_medicare_tax
     implemented: true
     idtl:
      - full: 2
-    text_description: Not available in taxsim full text description
-    full_text_group: Not available in taxsim full text description
+    text_description: "Not available in taxsim full text description"
+    full_text_group: "Not available in taxsim full text description"
   v45:
     variable: recovery_rebate_credit
     implemented: true
     idtl:
      - full: 2
      - full_text: 5
-    text_description: Cares Recovery Rebates
-    full_text_group: Regular Income Tax
+    text_description: "Cares Recovery Rebates"
+    full_text_group: "Regular Income Tax"
 
 taxsim_to_policyengine:
   household_situation:
