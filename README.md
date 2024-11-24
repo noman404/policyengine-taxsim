@@ -11,6 +11,8 @@ A TAXSIM emulator using the PolicyEngine US federal and state tax calculator.
 - [Input Variables](#input-variables)
   - [Demographics](#demographics)
   - [Income](#income)
+  - [Supported Output Type](#Supported output types as like taxsim)
+  - [Supported Households](#Supported household types)
 - [Contributing](#contributing)
 - [License](#license)
 - [Support](#support)
@@ -109,7 +111,7 @@ Depending on the idtl input value it can generate output types as following
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License 
-[MIT License](https://github.com/PolicyEngine/policyengine-taxsim?tab=readme-ov-file#)
+[MIT License](https://github.com/PolicyEngine/policyengine-taxsim?tab=License-1-ov-file#)
 
 ## Support
 
