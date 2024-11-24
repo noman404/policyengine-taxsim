@@ -11,8 +11,8 @@ A TAXSIM emulator using the PolicyEngine US federal and state tax calculator.
 - [Input Variables](#input-variables)
   - [Demographics](#demographics)
   - [Income](#income)
-  - [Supported Output Type](#Supported output types as like taxsim)
-  - [Supported Households](#Supported household types)
+  - [Output Types](#output-types)
+  - [Household Types](#household-types)
 - [Contributing](#contributing)
 - [License](#license)
 - [Support](#support)
@@ -87,24 +87,23 @@ The emulator accepts CSV files with the following variables:
 | pwages    | Primary taxpayer wages         |
 | swages    | Spouse wages                   |
 
-### Supported output types as like taxsim
+### Output Types
 
-Depending on the idtl input value it can generate output types as following
+Depending on the idtl input value it can generate output types as following:
 
 | idtl | Description     |
 |------|-----------------|
 | 0    | Standard output |
 | 2    | Full output     |
 
-### Supported household types
+### Household Types
 
-| Supported household types                                   |
+| Supported household types                |
 |----------------------------------------|
-| Single                                 |
-| Joint                                  |
-| Household with Dependent               |
-| Household with Dependent single parent |
-
+| Single                                  |
+| Joint                                   |
+| Household with Dependent                |
+| Household with Dependent single parent  |
 
 ## Contributing
 
