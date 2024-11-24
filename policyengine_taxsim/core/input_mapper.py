@@ -86,6 +86,10 @@ def check_if_exists_or_set_defaults(taxsim_vars):
 
     taxsim_vars["mstat"] = int(taxsim_vars.get("mstat", 1) or 1)
 
+    taxsim_vars['taxsimid'] = int(taxsim_vars.get("taxsimid", 0) or 0)
+
+    taxsim_vars['idtl'] = int(taxsim_vars.get("idtl", 0) or 0)
+
     return taxsim_vars
 
 

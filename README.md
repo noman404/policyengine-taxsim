@@ -1,57 +1,116 @@
-# Policyengine-taxsim
-TAXSIM emulator using the PolicyEngine US federal and state tax calculator
+# PolicyEngine-TAXSIM
 
-## How to use the emulator ##
-The emulator takes a .csv file in the form of a csv. This is the same form of input that Taxsim-35 takes.
+A TAXSIM emulator using the PolicyEngine US federal and state tax calculator.
 
-**Open your terminal in the parent directory**
+## Table of Contents
+- [Overview](#overview)
+- [Installation](#installation)
+  - [From Source](#from-source)
+  - [From PyPI](#from-pypi)
+- [Usage](#usage)
+- [Input Variables](#input-variables)
+  - [Demographics](#demographics)
+  - [Income](#income)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
-1. To install this package
+## Overview
 
-`pip install -e .`
+This project provides an emulator for TAXSIM-35, utilizing PolicyEngine's US federal and state tax calculator. It processes tax calculations through a CSV input format compatible with TAXSIM-35 specifications.
 
-2. to execute the simulation, run 
+## Installation
 
-`python policyengine_taxsim/cli.py resources/taxsim35/taxsim_input.csv `
+### From Source
 
-Output will be generated as `output.csv` in the same directory
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/PolicyEngine/policyengine-taxsim.git
+   cd policyengine-taxsim
+   ```
+
+2. Install the package:
+   ```bash
+   pip install -e .
+   ```
+3. To update the project codebase (for existing project)
+    ```bash
+   git pull origin main
+   ```
+
+4. To update dependencies used by the project (for existing project):
+   ```bash
+   pip install -e . --upgrade
+   ```
+
+### From PyPI
+
+```bash
+pip install git+https://github.com/PolicyEngine/policyengine-taxsim.git
+```
+
+## Usage
+
+Run the simulation by providing your input CSV file:
+
+```bash
+python policyengine_taxsim/cli.py your_input_file.csv
+```
+
+The output will be generated as `output.csv` in the same directory.
+
+## Input Variables
+
+The emulator accepts CSV files with the following variables:
+
+### Demographics
+
+| Variable  | Description                     | Notes                                    |
+|-----------|--------------------------------|------------------------------------------|
+| taxsimid  | Unique identifier              |                                          |
+| year      | Tax year                       |                                          |
+| state     | State code                     |                                          |
+| mstat     | Marital status                 | Only supports: 1 (single), 2 (joint)     |
+| page      | Primary taxpayer age           |                                          |
+| sage      | Spouse age                     |                                          |
+| depx      | Number of dependents           |                                          |
+| age1      | First dependent's age          |                                          |
+| age2      | Second dependent's age         |                                          |
+| ageN      | Nth dependent's age            |                                          |
+
+### Income
+
+| Variable  | Description                     |
+|-----------|--------------------------------|
+| pwages    | Primary taxpayer wages         |
+| swages    | Spouse wages                   |
+
+### Supported output types as like taxsim
+
+Depending on the idtl input value it can generate output types as following
+
+| idtl | Description     |
+|------|-----------------|
+| 0    | Standard output |
+| 2    | Full output     |
+
+### Supported household types
+
+| Supported household types                                   |
+|----------------------------------------|
+| Single                                 |
+| Joint                                  |
+| Household with Dependent               |
+| Household with Dependent single parent |
 
 
-**For directly installing from pip**
+## Contributing
 
-You can install through to execute directly
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-`pip install git+https://github.com/PolicyEngine/policyengine-taxsim.git`
+## License 
+[MIT License](https://github.com/PolicyEngine/policyengine-taxsim?tab=readme-ov-file#)
 
-### Example ##
-input file:
+## Support
 
-<img width="641" alt="Screenshot 2024-07-10 at 6 29 17 PM" src="https://github.com/sgerson2/policyengine-taxsim/assets/113052102/db0ee3e4-9a54-42e7-a4fc-e46f07ab83f8">
-
-
-## List of working input variables ##
-
-### Demographics: ###
-1. taxsimid 
-2. year
-3. state
-4. mstat (only 1 (single) and 2 (joint) filing options work)
-5. page (age of primary taxpayer)
-6. sage (age of spouse)
-7. depx (number of dependents)
-8. age1 (age of first dependent)
-9. age2 (age of second dependent)
-10. age3 (age of third dependent)
-
-### Income: ###
-1. pwages (wage of primary taxpayer)
-2. swages (wage of spouse)
-3. psemp (self-employment income of primary taxpayer)
-4. ssemp (self-employment income of spouse)
-5. dividends (dividend income)
-6. intrec (taxable interest received)
-7. stcg (short-term capital gains)
-8. ltcg (long-term capital gains)
-9. pui (primary taxpayer unemployment compensation received)
-10. sui (spouse unemployment compensation received)
-11. proptax (real estate taxes paid)
+For issues and feature requests, please [open an issue](https://github.com/PolicyEngine/policyengine-taxsim/issues).
