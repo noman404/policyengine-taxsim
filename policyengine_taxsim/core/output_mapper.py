@@ -3,9 +3,11 @@ from .utils import (
     get_state_number, to_roundedup_number,
 )
 from policyengine_us import Simulation
+from policyengine_tests_generator.core.generator import PETestsYAMLGenerator
 
 
 def generate_non_description_output(taxsim_output, mappings, year, state_name, simulation, output_type):
+    outputs = []
     for key, value in mappings.items():
         if value['implemented']:
             if key == "year":
@@ -24,86 +26,27 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                 for entry in value['idtl']:
                     if output_type in entry.values():
                         taxsim_output[key] = simulate(simulation, pe_variable, year)
+                        outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
+
+    file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
+    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name)
 
     return taxsim_output
 
 
-def generate_text_description_output(taxsim_output, mappings, year, state_name, simulation):
-    groups = {}
-    group_orders = {}
-
-    for var_name, var_info in mappings.items():
-        if (
-                "full_text_group" in var_info
-                and "text_description" in var_info
-                and "implemented" in var_info
-                and var_info["implemented"] is True
-                and any(item.get("full_text", 0) == 5 for item in var_info["idtl"])
-        ):
-            group = var_info["full_text_group"]
-            group_order = var_info["group_order"]
-
-            if group not in groups:
-                groups[group] = []
-                group_orders[group] = group_order
-
-            groups[group].append((var_info["text_description"], var_name, var_info))
-
-    lines = [""]
-
-    # Configuration for tab space
-    LEFT_MARGIN = 4
-    LABEL_INDENT = 4
-    LABEL_WIDTH = 45
-    VALUE_WIDTH = 12
-
-    sorted_groups = sorted(groups.keys(), key=lambda x: group_orders[x])
-
-    for group_name in sorted_groups:
-        variables = groups[group_name]
-        if variables:
-
-            lines.append(f"{'' * LEFT_MARGIN}{group_name}:")
-
-            for desc, var_name, each_variable in sorted(variables, key=lambda x: x[0]):
-
-                variable = each_variable['variable']
-
-                if "state" in variable:
-                    variable = variable.replace("state", state_name).lower()
-
-                if var_name == "year":
-                    value = year
-                elif var_name == "state":
-                    value = f"{get_state_number(state_name)}{' ' * LEFT_MARGIN}{state_name}"
-                elif var_name == "fica":
-                    value = simulate_multiple(simulation, each_variable['variables'], year)
-                else:
-                    value = simulate(simulation, variable, year)
-
-                if isinstance(value, (int, float)):
-                    formatted_value = f"{value:>8.2f}"
-                else:
-                    formatted_value = str(value)
-
-                desc_lines = desc.split('\n')
-                for i, desc_line in enumerate(desc_lines):
-
-                    indent = LEFT_MARGIN + LABEL_INDENT
-
-                    if i == 0:
-                        padded_desc = f"{' ' * indent}{desc_line}"
-                        lines.append(f"{padded_desc:<{LABEL_WIDTH + indent}}{formatted_value:>{VALUE_WIDTH}}")
-                    else:
-                        padded_desc = f"{' ' * indent}{desc_line}"
-                        lines.append(f"{padded_desc:<{LABEL_WIDTH + indent}}")
-
-            lines.append("")
-
-    return "\n".join(lines)
+def generate_pe_tests_yaml(household, outputs, file_name):
+    generator = PETestsYAMLGenerator()
+    yaml_data = generator.generate_yaml(
+        household_data=household,
+        name=file_name,
+        pe_outputs=outputs
+    )
+    output = generator._get_yaml(yaml_data)
+    with open(file_name, "w") as f:
+        f.write(output)
 
 
-def generate_text_description_output2(taxsim_output, mappings, year, state_name, simulation):
+def generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more):
     groups = {}
     group_orders = {}
 
@@ -134,7 +77,7 @@ def generate_text_description_output2(taxsim_output, mappings, year, state_name,
 
     lines = [""]
     sorted_groups = sorted(groups.keys(), key=lambda x: group_orders[x])
-
+    outputs = []
     for group_name in sorted_groups:
         variables = groups[group_name]
         if variables:
@@ -169,6 +112,7 @@ def generate_text_description_output2(taxsim_output, mappings, year, state_name,
                     value = simulate_multiple(simulation, each_variable['variables'], year)
                 else:
                     value = simulate(simulation, variable, year)
+                    outputs.append({'variable': variable, 'value': value})
 
                 # Format the base value
                 if isinstance(value, (int, float)):
@@ -178,11 +122,15 @@ def generate_text_description_output2(taxsim_output, mappings, year, state_name,
 
                 # Format second column value if needed
                 if needs_second_column:
-                    if isinstance(value, (int, float)):
-                        second_value = value + 1
+                    if var_name == "fica":
+                        second_value = simulate_multiple(simulation_1dollar_more, each_variable['variables'], year)
+                    else:
+                        second_value = simulate(simulation_1dollar_more, variable, year)
+
+                    if isinstance(second_value, (int, float)):
                         formatted_second_value = f"{second_value:>8.1f}"
                     else:
-                        formatted_second_value = str(value)
+                        formatted_second_value = str(second_value)
 
                 # Handle multi-line descriptions
                 desc_lines = desc.split('\n')
@@ -198,8 +146,35 @@ def generate_text_description_output2(taxsim_output, mappings, year, state_name,
 
             lines.append("")
 
+    file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
+    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name)
+
     return "\n".join(lines)
 
+
+def add_1dollar(data):
+    """
+    Recursively traverse through JSON data and add 1 to all employment_income values.
+
+    Args:
+        data: Dict or list containing the JSON data
+
+    Returns:
+        Updated data structure with modified employment_income values
+    """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key == "employment_income" and isinstance(value, dict):
+                for year in value:
+                    value[year] += 1
+            elif isinstance(value, (dict, list)):
+                add_1dollar(value)
+    elif isinstance(data, list):
+        for item in data:
+            if isinstance(item, (dict, list)):
+                add_1dollar(item)
+
+    return data
 
 def export_household(taxsim_input, policyengine_situation):
     """
@@ -212,7 +187,7 @@ def export_household(taxsim_input, policyengine_situation):
         dict: Dictionary of TAXSIM output variables
     """
     mappings = load_variable_mappings()["policyengine_to_taxsim"]
-    print(policyengine_situation)
+
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(
@@ -233,7 +208,9 @@ def export_household(taxsim_input, policyengine_situation):
         taxsim_output = generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
                                                         output_type)
     else:
-        taxsim_output = generate_text_description_output2(taxsim_output, mappings, year, state_name, simulation)
+        _1dollar_more_situation = add_1dollar(policyengine_situation)
+        simulation_1dollar_more = Simulation(situation=_1dollar_more_situation)
+        taxsim_output = generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more)
 
         with open("taxsim_output.txt", "w") as f:
             f.write(taxsim_output)
@@ -242,9 +219,7 @@ def export_household(taxsim_input, policyengine_situation):
 
 def simulate(simulation, variable, year):
     try:
-        output = to_roundedup_number(simulation.calculate(variable, period=year))
-        print(variable, output)
-        return output
+        return to_roundedup_number(simulation.calculate(variable, period=year))
     except Exception as error:
         return 0.00
 
