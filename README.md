@@ -30,17 +30,27 @@ This project provides an emulator for TAXSIM-35, utilizing PolicyEngine's US fed
    git clone https://github.com/PolicyEngine/policyengine-taxsim.git
    cd policyengine-taxsim
    ```
+2. Create a virtual environment:
+   ```bash
+   # For Windows
+   python -m venv venv
+   venv\Scripts\activate
 
-2. Install the package:
+   # For macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Install the package:
    ```bash
    pip install -e .
    ```
-3. To update the project codebase (for existing project)
+4. To update the project codebase (for existing project)
     ```bash
    git pull origin main
    ```
 
-4. To update dependencies used by the project (for existing project):
+5. To update dependencies used by the project (for existing project):
    ```bash
    pip install -e . --upgrade
    ```
@@ -67,18 +77,18 @@ The emulator accepts CSV files with the following variables:
 
 ### Demographics
 
-| Variable  | Description                     | Notes                                    |
-|-----------|--------------------------------|------------------------------------------|
-| taxsimid  | Unique identifier              |                                          |
-| year      | Tax year                       |                                          |
-| state     | State code                     |                                          |
-| mstat     | Marital status                 | Only supports: 1 (single), 2 (joint)     |
-| page      | Primary taxpayer age           |                                          |
-| sage      | Spouse age                     |                                          |
-| depx      | Number of dependents           |                                          |
-| age1      | First dependent's age          |                                          |
-| age2      | Second dependent's age         |                                          |
-| ageN      | Nth dependent's age            |                                          |
+| Variable  | Description                     | Notes                                       |
+|-----------|--------------------------------|---------------------------------------------|
+| taxsimid  | Unique identifier              |                                             |
+| year      | Tax year                       |                                             |
+| state     | State code                     |                                             |
+| mstat     | Marital status                 | Only supports: 1 (single), 2 (joint)        |
+| page      | Primary taxpayer age           |                                             |
+| sage      | Spouse age                     |                                             |
+| depx      | Number of dependents           |                                             |
+| age1      | First dependent's age          |                                             |
+| age2      | Second dependent's age         |                                             |
+| ageN      | Nth dependent's age            | Taxsim only allow upto 8 children dependent |
 
 ### Income
 
