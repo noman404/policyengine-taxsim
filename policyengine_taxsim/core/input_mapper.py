@@ -78,13 +78,33 @@ def form_household_situation(year, state, taxsim_vars):
     return household_situation
 
 
-def check_if_exists_or_set_defaults(taxsim_vars):
-    taxsim_vars["state"] = int(taxsim_vars.get("state",
-                                               44) or 44)  # set TX (texas) as default is no state field has passed or passed as 0
+def set_taxsim_defaults(taxsim_vars: dict) -> dict:
+    """
+    Set default values for TAXSIM variables if they don't exist or are falsy.
 
-    taxsim_vars["depx"] = int(taxsim_vars.get("depx", 0) or 0)
+    Args:
+        taxsim_vars (dict): Dictionary containing TAXSIM input variables
 
-    taxsim_vars["mstat"] = int(taxsim_vars.get("mstat", 1) or 1)
+    Returns:
+        dict: Updated dictionary with default values set where needed
+
+    Default values:
+        - state: 44 (Texas)
+        - depx: 0 (Number of dependents)
+        - mstat: 1 (Marital status)
+        - taxsimid: 0 (TAXSIM ID)
+        - idtl: 0 (output flag)
+    """
+    DEFAULTS = {
+        "state": 44,  # Texas
+        "depx": 0,  # Number of dependents
+        "mstat": 1,  # Marital status
+        "taxsimid": 0,  # TAXSIM ID
+        "idtl": 0  # output flag
+    }
+
+    for key, default_value in DEFAULTS.items():
+        taxsim_vars[key] = int(taxsim_vars.get(key, default_value) or default_value)
 
     return taxsim_vars
 
@@ -102,7 +122,7 @@ def generate_household(taxsim_vars):
 
     year = str(int(taxsim_vars["year"]))  # Ensure year is an integer string
 
-    taxsim_vars = check_if_exists_or_set_defaults(taxsim_vars)
+    taxsim_vars = set_taxsim_defaults(taxsim_vars)
 
     state = get_state_code(taxsim_vars["state"])
 
