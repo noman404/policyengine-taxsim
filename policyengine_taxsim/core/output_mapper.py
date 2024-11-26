@@ -29,7 +29,7 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                         outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
 
     file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
-    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name)
+    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name, logs)
 
     return taxsim_output
 
