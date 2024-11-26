@@ -6,7 +6,7 @@ from policyengine_us import Simulation
 from policyengine_tests_generator.core.generator import PETestsYAMLGenerator
 
 
-def generate_non_description_output(taxsim_output, mappings, year, state_name, simulation, output_type):
+def generate_non_description_output(taxsim_output, mappings, year, state_name, simulation, output_type, logs):
     outputs = []
     for key, value in mappings.items():
         if value['implemented']:
@@ -34,19 +34,20 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
     return taxsim_output
 
 
-def generate_pe_tests_yaml(household, outputs, file_name):
-    generator = PETestsYAMLGenerator()
-    yaml_data = generator.generate_yaml(
-        household_data=household,
-        name=file_name,
-        pe_outputs=outputs
-    )
-    output = generator._get_yaml(yaml_data)
-    with open(file_name, "w") as f:
-        f.write(output)
+def generate_pe_tests_yaml(household, outputs, file_name, logs):
+    if logs:
+        generator = PETestsYAMLGenerator()
+        yaml_data = generator.generate_yaml(
+            household_data=household,
+            name=file_name,
+            pe_outputs=outputs
+        )
+        output = generator._get_yaml(yaml_data)
+        with open(file_name, "w") as f:
+            f.write(output)
 
 
-def generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more):
+def generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more, logs):
     groups = {}
     group_orders = {}
 
@@ -147,12 +148,92 @@ def generate_text_description_output(taxsim_output, mappings, year, state_name, 
             lines.append("")
 
     file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
-    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name)
+    generate_pe_tests_yaml(simulation.situation_input, outputs, file_name, logs)
 
     return "\n".join(lines)
 
 
-def add_1dollar(data):
+def taxsim_input_definition(data_dict, year):
+    """Process a dictionary of data according to the configuration."""
+    output_lines = [""]
+    mappings = load_variable_mappings()["taxsim_input_definition"]
+
+    # Header lines using year from input data
+    current_year = data_dict.get('year', year)
+    output_lines.extend([
+        f"       {current_year}",
+        " NBER TAXSIM Model v35 (03/05/24) With TCJA",
+        f" State law coded through        {current_year}",
+        " Later state laws extrapolated from that year.",
+        " Marginal tax rate wrt taxpayer earnings.",
+        "",
+        " Input Data:"
+    ])
+
+    # Process each field from config that exists in data_dict
+    for field_config in mappings:
+        # Each item in mappings is a dictionary with one key-value pair
+        field = list(field_config.keys())[0]
+        config = field_config[field]
+
+        if field in data_dict:
+            name = config['name']
+            value = data_dict[field]
+
+            # Handle paired fields if they exist
+            if 'pair' in config and config['pair'] in data_dict:
+                pair_field = config['pair']
+                pair_value = data_dict[pair_field]
+
+                # Handle type conversion for special fields
+                if 'type' in config:
+                    try:
+                        # Convert value based on type mapping if exists
+                        type_mapping = config['type'][0]  # Get the first (and only) dictionary
+                        value = next((v for k, v in type_mapping.items() if k.lower() == str(value).lower()), value)
+                    except (KeyError, AttributeError):
+                        pass
+
+                try:
+                    output_lines.append(
+                        f"{name:>33} {float(value):>10.2f} {float(pair_value):>10.2f}"
+                    )
+                except (ValueError, TypeError):
+                    output_lines.append(
+                        f"{name:>33} {str(value):>10} {str(pair_value):>10}"
+                    )
+            else:
+                # Handle type conversion for special fields
+                if 'type' in config:
+                    try:
+                        # Convert value based on type mapping if exists
+                        type_mapping = config['type'][0]  # Get the first (and only) dictionary
+                        value = next((v for k, v in type_mapping.items() if k.lower() == str(value).lower()), value)
+                    except (KeyError, AttributeError):
+                        pass
+
+                try:
+                    # Try to convert to float for numeric formatting
+                    float_value = float(value)
+                    output_lines.append(f"{name:>33} {float_value:>10.2f}")
+                except (ValueError, TypeError):
+                    # Handle non-numeric values
+                    output_lines.append(f"{name:>33} {str(value):>10}")
+
+    # Add opt1/opt2 values if they exist in input
+    if all(key in data_dict for key in ['opt1', 'opt1v']):
+        output_lines.append(
+            f" 39/40. opt1/value: {float(data_dict['opt1']):>20.2f} {float(data_dict['opt1v']):>10.2f}"
+        )
+    if all(key in data_dict for key in ['opt2', 'opt2v']):
+        output_lines.append(
+            f" 41/42. opt2/value: {float(data_dict['opt2']):>20.2f} {float(data_dict['opt2v']):>10.2f}"
+        )
+
+    return "\n".join(output_lines)
+
+
+def add_1dollar_more(data):
     """
     Recursively traverse through JSON data and add 1 to all employment_income values.
 
@@ -168,15 +249,16 @@ def add_1dollar(data):
                 for year in value:
                     value[year] += 1
             elif isinstance(value, (dict, list)):
-                add_1dollar(value)
+                add_1dollar_more(value)
     elif isinstance(data, list):
         for item in data:
             if isinstance(item, (dict, list)):
-                add_1dollar(item)
+                add_1dollar_more(item)
 
     return data
 
-def export_household(taxsim_input, policyengine_situation):
+
+def export_household(taxsim_input, policyengine_situation, logs):
     """
     Convert a PolicyEngine situation to TAXSIM output variables.
 
@@ -206,13 +288,17 @@ def export_household(taxsim_input, policyengine_situation):
 
     if int(output_type) in [0, 2]:
         taxsim_output = generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
-                                                        output_type)
+                                                        output_type, logs)
     else:
-        _1dollar_more_situation = add_1dollar(policyengine_situation)
+        input_definitions_lines = taxsim_input_definition(taxsim_output, year)
+        _1dollar_more_situation = add_1dollar_more(policyengine_situation)
         simulation_1dollar_more = Simulation(situation=_1dollar_more_situation)
-        taxsim_output = generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more)
+        taxsim_output = generate_text_description_output(taxsim_output, mappings, year, state_name, simulation,
+                                                         simulation_1dollar_more, logs)
 
         with open("taxsim_output.txt", "w") as f:
+            f.write(input_definitions_lines)
+            f.write("\n")
             f.write(taxsim_output)
     return taxsim_output
 

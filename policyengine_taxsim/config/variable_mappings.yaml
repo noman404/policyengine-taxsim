@@ -481,7 +481,64 @@ taxsim_to_policyengine:
       your tax unit:
         members: []
 
-taxsim_input_defination:
-
-
+taxsim_input_definition:
+  - taxsimid:
+      name: "1. Record ID"
+  - year:
+      name: "2. Tax Year"
+  - state:
+      name: "State Code"
+  - mstat:
+      name: "Matital Status"
+      type:
+        - single: 1
+        - joint: 2
+  - page:
+      name: "5-6. Age (Txpyr/Spouse)"
+      pair: sage
+  - depx:
+      name: "8-10. #deps for CCC/CTC/EIC"
+  - pwages:
+      name: "11-12. Wages (Txpyr/Spouse)"
+      pair: swages
+  - psemp:
+      name: "11a12a Self-employment income"
+      pair: ssemp
+  - dividends:
+      name: "13. Dividend Income"
+  - intrec:
+      name: "14. Interest Received"
+  - stcg:
+      name: "15. Short Term Gains"
+  - ltcg:
+      name: "16. Long Term Gains"
+  - otherprop:
+      name: "17. Other Property"
+  - nonprop:
+      name: "18. Other Non-Property"
+  - pensions:
+      name: "19. Taxable Pensions"
+  - gssi:
+      name: "20. Gross Social Security"
+  - pui:
+      name: "21. Tot/Txpy/Spouse UI"
+      pair: sui
+  - transfers:
+      name: "22. Non-taxable Transfers"
+  - rentpaid:
+      name: "23. Rent Paid"
+  - proptax:
+      name: "24. Property Taxes Paid"
+  - otheritem:
+      name: "25. Other Itemized Deds"
+  - childcare:
+      name: "26. Child Care Expenses"
+  - mortgage:
+      name: "27. Mortgage Interest"
+  - scorp:
+      name: "28. S-Corp profits"
+  - pbusinc:
+      name: "29 31. Txpy/Spouse QBI w/o PO"
+  - pprofinc:
+      name: "30 32. Txpy/Spouse SSTB w PO"
 

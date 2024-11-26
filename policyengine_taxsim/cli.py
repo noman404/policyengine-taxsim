@@ -17,7 +17,8 @@ except ImportError:
     default="output.csv",
     help="Output file path",
 )
-def main(input_file, output):
+@click.option('--logs', is_flag=True, help='Generate Logs')
+def main(input_file, output, logs):
     """
     Process TAXSIM input file and generate PolicyEngine-compatible output.
     """
@@ -30,7 +31,7 @@ def main(input_file, output):
         for _, row in df.iterrows():
             taxsim_input = row.to_dict()
             pe_situation = generate_household(taxsim_input)
-            taxsim_output = export_household(taxsim_input, pe_situation)
+            taxsim_output = export_household(taxsim_input, pe_situation, logs)
             results.append(taxsim_output)
 
         # Create output dataframe and save to csv
