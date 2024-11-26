@@ -177,7 +177,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "17. Deductions allowed \nQBI deduction"
+    text_description: "17. Deductions allowed \n  QBI deduction"
     group_order: 3
     full_text_group: "Federal Tax Calculation"
     group_column: 2
@@ -287,7 +287,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "28. Income Tax Before Credits \nTotal Credits"
+    text_description: "28. Income Tax Before Credits \n Total Credits"
     group_order: 3
     full_text_group: "Federal Tax Calculation"
     group_column: 2
@@ -297,7 +297,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "29. FICA \nTaxpayer share of FICA"
+    text_description: "29. FICA \n  Taxpayer share of FICA"
     group_order: 3
     full_text_group: "Federal Tax Calculation"
     group_column: 2
@@ -367,7 +367,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "36. Taxable Income \nTax before credits"
+    text_description: "36. Taxable Income \n  Tax before credits"
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 2
@@ -397,7 +397,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "39. EIC \nEnergy|Fuel Credit \nChild Tax Credit"
+    text_description: "39. EIC \n Energy|Fuel Credit \n Child Tax Credit"
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 2
@@ -417,7 +417,7 @@ policyengine_to_taxsim:
     idtl:
      - full: 2
      - full_text: 5
-    text_description: "41. Bracket Rate \nState Tax after Credits"
+    text_description: "41. Bracket Rate \n  State Tax after Credits"
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 2
@@ -487,9 +487,9 @@ taxsim_input_definition:
   - year:
       name: "2. Tax Year"
   - state:
-      name: "State Code"
+      name: "3. State Code"
   - mstat:
-      name: "Matital Status"
+      name: "4. Marital Status"
       type:
         - single: 1
         - joint: 2

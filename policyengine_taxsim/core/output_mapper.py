@@ -47,11 +47,11 @@ def generate_pe_tests_yaml(household, outputs, file_name, logs):
             f.write(output)
 
 
-def generate_text_description_output(taxsim_output, mappings, year, state_name, simulation, simulation_1dollar_more, logs):
+def generate_text_description_output(taxsim_input, mappings, year, state_name, simulation, simulation_1dollar_more,
+                                     logs):
     groups = {}
     group_orders = {}
 
-    # Sort variables into groups
     for var_name, var_info in mappings.items():
         if (
                 "full_text_group" in var_info
@@ -75,6 +75,7 @@ def generate_text_description_output(taxsim_output, mappings, year, state_name, 
     LABEL_WIDTH = 45
     VALUE_WIDTH = 15
     SECOND_VALUE_WIDTH = 12
+    GROUP_MARGIN = LEFT_MARGIN  # Groups are 2 tabs left of text_description
 
     lines = [""]
     sorted_groups = sorted(groups.keys(), key=lambda x: group_orders[x])
@@ -86,17 +87,15 @@ def generate_text_description_output(taxsim_output, mappings, year, state_name, 
             has_second_column = any(var_info.get('group_column', 1) == 2 for _, _, var_info in variables)
 
             if has_second_column:
-                # Calculate spacing similar to text_description lines
-                indent = LEFT_MARGIN + LABEL_INDENT
-                line = f"{' ' * (LEFT_MARGIN + 3)}{group_name}:"
-                padding = ' ' * (LABEL_WIDTH - len(group_name))
-                # Format Base and +$1 like the values below
+                # Group headers are 2 tabs left of text_description
+                line = f"{' ' * GROUP_MARGIN}{group_name}:"
+                padding = ' ' * (LABEL_WIDTH + LABEL_INDENT - len(group_name) - 1)  # -1 for the colon
                 base_text = f"{'Base':>8}"
                 plus_one_text = f"{'+$1':>8}"
                 lines.append(f"{line}{padding}{base_text:>{VALUE_WIDTH}}{plus_one_text:>{SECOND_VALUE_WIDTH}}")
             else:
-                # Add just the group name
-                lines.append(f"{' ' * LEFT_MARGIN}{group_name}:")
+                # Group headers are 2 tabs left of text_description
+                lines.append(f"{' ' * GROUP_MARGIN}{group_name}:")
 
             for desc, var_name, each_variable in sorted(variables, key=lambda x: x[0]):
                 variable = each_variable['variable']
@@ -147,15 +146,15 @@ def generate_text_description_output(taxsim_output, mappings, year, state_name, 
 
             lines.append("")
 
-    file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
+    file_name = f"{taxsim_input['taxsimid']}-{state_name}.yaml"
     generate_pe_tests_yaml(simulation.situation_input, outputs, file_name, logs)
 
     return "\n".join(lines)
 
 
-def taxsim_input_definition(data_dict, year):
+def taxsim_input_definition(data_dict, year, state_name):
     """Process a dictionary of data according to the configuration."""
-    output_lines = [""]
+    output_lines = []
     mappings = load_variable_mappings()["taxsim_input_definition"]
 
     # Header lines using year from input data
@@ -167,75 +166,77 @@ def taxsim_input_definition(data_dict, year):
         " Later state laws extrapolated from that year.",
         " Marginal tax rate wrt taxpayer earnings.",
         "",
-        " Input Data:"
+        "   Input Data:"
     ])
 
-    # Process each field from config that exists in data_dict
-    for field_config in mappings:
-        # Each item in mappings is a dictionary with one key-value pair
-        field = list(field_config.keys())[0]
-        config = field_config[field]
+    # Configuration for formatting
+    LEFT_MARGIN = 4
+    LABEL_INDENT = 4
+    LABEL_WIDTH = 45
+    VALUE_WIDTH = 15
+    SECOND_VALUE_WIDTH = 12
 
+    # Process each field from mappings in order
+    for mapping in mappings:
+        field, config = next(iter(mapping.items()))
+
+        # Check if field exists in data_dict
         if field in data_dict:
-            name = config['name']
             value = data_dict[field]
-
-            # Handle paired fields if they exist
+            name = config['name']
+            # Handle paired fields
             if 'pair' in config and config['pair'] in data_dict:
                 pair_field = config['pair']
                 pair_value = data_dict[pair_field]
 
-                # Handle type conversion for special fields
-                if 'type' in config:
-                    try:
-                        # Convert value based on type mapping if exists
-                        type_mapping = config['type'][0]  # Get the first (and only) dictionary
-                        value = next((v for k, v in type_mapping.items() if k.lower() == str(value).lower()), value)
-                    except (KeyError, AttributeError):
-                        pass
-
-                try:
-                    output_lines.append(
-                        f"{name:>33} {float(value):>10.2f} {float(pair_value):>10.2f}"
-                    )
-                except (ValueError, TypeError):
-                    output_lines.append(
-                        f"{name:>33} {str(value):>10} {str(pair_value):>10}"
-                    )
+                indent = LEFT_MARGIN + LABEL_INDENT
+                line = f"{' ' * indent}{name:<{LABEL_WIDTH}}{float(value):>{VALUE_WIDTH}.2f}"
+                line += f"{float(pair_value):>{SECOND_VALUE_WIDTH}.2f}"
+                output_lines.append(line)
             else:
-                # Handle type conversion for special fields
-                if 'type' in config:
+                # Format and append the line
+                indent = LEFT_MARGIN + LABEL_INDENT
+
+                if field == 'mstat' and 'type' in config:
                     try:
-                        # Convert value based on type mapping if exists
-                        type_mapping = config['type'][0]  # Get the first (and only) dictionary
-                        value = next((v for k, v in type_mapping.items() if k.lower() == str(value).lower()), value)
-                    except (KeyError, AttributeError):
-                        pass
+                        if isinstance(value, str):
+                            if value.lower() == 'single':
+                                output_lines.append(
+                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{1:>{VALUE_WIDTH}.2f} {value.lower()}")
+                                value = 1
+                            elif value.lower() == 'joint':
+                                output_lines.append(
+                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{2:>{VALUE_WIDTH}.2f} {value.lower()}")
+                                value = 2
+                    except (ValueError, AttributeError) as e:
+                        print(e)
 
-                try:
-                    # Try to convert to float for numeric formatting
-                    float_value = float(value)
-                    output_lines.append(f"{name:>33} {float_value:>10.2f}")
-                except (ValueError, TypeError):
-                    # Handle non-numeric values
-                    output_lines.append(f"{name:>33} {str(value):>10}")
-
-    # Add opt1/opt2 values if they exist in input
-    if all(key in data_dict for key in ['opt1', 'opt1v']):
-        output_lines.append(
-            f" 39/40. opt1/value: {float(data_dict['opt1']):>20.2f} {float(data_dict['opt1v']):>10.2f}"
-        )
-    if all(key in data_dict for key in ['opt2', 'opt2v']):
-        output_lines.append(
-            f" 41/42. opt2/value: {float(data_dict['opt2']):>20.2f} {float(data_dict['opt2v']):>10.2f}"
-        )
+                if field == "state":
+                    output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{value:>{VALUE_WIDTH}.2f} {state_name}")
+                else:
+                    try:
+                        float_value = float(value)
+                        output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{float_value:>{VALUE_WIDTH}.2f}")
+                    except (ValueError, TypeError):
+                        output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{str(value):>{VALUE_WIDTH}}")
+        else:
+            # If field doesn't exist in data_dict, output zero
+            name = config['name']
+            indent = LEFT_MARGIN + LABEL_INDENT
+            # Handle paired fields that don't exist
+            if 'pair' in config:
+                line = f"{' ' * indent}{name:<{LABEL_WIDTH}}{0:>{VALUE_WIDTH}.2f}"
+                line += f"{0:>{SECOND_VALUE_WIDTH}.2f}"
+                output_lines.append(line)
+            else:
+                output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{0:>{VALUE_WIDTH}.2f}")
 
     return "\n".join(output_lines)
 
 
-def add_1dollar_more(data):
+def add_a_dollar(data):
     """
-    Recursively traverse through JSON data and add 1 to all employment_income values.
+    Recursively traverse through JSON data and add $1 to all employment_income values.
 
     Args:
         data: Dict or list containing the JSON data
@@ -249,11 +250,11 @@ def add_1dollar_more(data):
                 for year in value:
                     value[year] += 1
             elif isinstance(value, (dict, list)):
-                add_1dollar_more(value)
+                add_a_dollar(value)
     elif isinstance(data, list):
         for item in data:
             if isinstance(item, (dict, list)):
-                add_1dollar_more(item)
+                add_a_dollar(item)
 
     return data
 
@@ -287,20 +288,15 @@ def export_household(taxsim_input, policyengine_situation, logs):
     output_type = taxsim_input["idtl"]
 
     if int(output_type) in [0, 2]:
-        taxsim_output = generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
+        return generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
                                                         output_type, logs)
     else:
-        input_definitions_lines = taxsim_input_definition(taxsim_output, year)
-        _1dollar_more_situation = add_1dollar_more(policyengine_situation)
-        simulation_1dollar_more = Simulation(situation=_1dollar_more_situation)
-        taxsim_output = generate_text_description_output(taxsim_output, mappings, year, state_name, simulation,
-                                                         simulation_1dollar_more, logs)
-
-        with open("taxsim_output.txt", "w") as f:
-            f.write(input_definitions_lines)
-            f.write("\n")
-            f.write(taxsim_output)
-    return taxsim_output
+        input_definitions_lines = taxsim_input_definition(taxsim_input, year, state_name)
+        a_dollar_more_situation = add_a_dollar(policyengine_situation)
+        simulation_a_dollar_more = Simulation(situation=a_dollar_more_situation)
+        output = generate_text_description_output(taxsim_input, mappings, year, state_name, simulation,
+                                                  simulation_a_dollar_more, logs)
+        return f"{input_definitions_lines}\n{output}\n"
 
 
 def simulate(simulation, variable, year):
