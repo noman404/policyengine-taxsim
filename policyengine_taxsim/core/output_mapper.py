@@ -289,7 +289,7 @@ def export_household(taxsim_input, policyengine_situation, logs):
 
     if int(output_type) in [0, 2]:
         return generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
-                                                        output_type, logs)
+                                               output_type, logs)
     else:
         input_definitions_lines = taxsim_input_definition(taxsim_input, year, state_name)
         a_dollar_more_situation = add_a_dollar(policyengine_situation)

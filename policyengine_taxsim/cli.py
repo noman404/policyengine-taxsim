@@ -64,11 +64,13 @@ def main(input_file, output, logs):
 
 
 def to_csv_str(results):
-    output_df = pd.DataFrame(results)
+    if results is None:
+        return ""
 
-    csv_buffer = StringIO()
-    output_df.to_csv(csv_buffer, index=False)
-    return csv_buffer.getvalue()
+    df = pd.DataFrame(results)
+    content = df.to_csv(index=False, float_format='%.1f', lineterminator='\n')
+    cleaned_df = pd.read_csv(StringIO(content))
+    return cleaned_df.to_csv(index=False, lineterminator='\n')
 
 
 if __name__ == "__main__":
