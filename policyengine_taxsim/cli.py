@@ -64,7 +64,7 @@ def main(input_file, output, logs):
 
 
 def to_csv_str(results):
-    if results is None:
+    if len(results) == 0 or results is None:
         return ""
 
     df = pd.DataFrame(results)

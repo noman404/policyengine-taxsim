@@ -5,10 +5,53 @@ from .utils import (
 import copy
 
 
-def add_additional_tax_units(state, year, situation):
-    has_use_tax = ['pa', 'nc', 'ca', 'il', 'in', 'ok']
-    if state in has_use_tax:
-        situation["tax_units"]["your tax unit"][f"{state}_use_tax"] = {str(year): 0.0}
+def add_additional_units(state, year, situation, taxsim_vars):
+
+    additional_tax_units_config = load_variable_mappings()["taxsim_to_policyengine"]["household_situation"]["additional_tax_units"]
+    additional_income_units_config = load_variable_mappings()["taxsim_to_policyengine"]["household_situation"]["additional_income_units"]
+
+    tax_unit = situation["tax_units"]["your tax unit"]
+    people_unit = situation["people"]["you"]
+
+    for item in additional_tax_units_config:
+        for field, values in item.items():
+            if not values:
+                continue
+
+            if field == "state_use_tax":
+                if state.lower() in values:
+                    tax_unit[f"{state}_use_tax"] = {str(year): 0}
+                continue
+
+            if len(values) > 1:
+                matching_values = [
+                    taxsim_vars.get(value, 0)
+                    for value in values
+                    if value in taxsim_vars
+                ]
+                if matching_values:
+                    tax_unit[field] = {str(year): sum(matching_values)}
+
+            elif len(values) == 1 and values[0] in taxsim_vars:
+                tax_unit[field] = {str(year): taxsim_vars[values[0]]}
+
+    for item in additional_income_units_config:
+        for field, values in item.items():
+            if not values:
+                continue
+
+            if len(values) > 1:
+                matching_values = [
+                    taxsim_vars.get(value, 0)
+                    for value in values
+                    if value in taxsim_vars
+                ]
+                if matching_values:
+                    people_unit[field] = {str(year): sum(matching_values)}
+
+            elif len(values) == 1 and values[0] in taxsim_vars:
+                people_unit[field] = {str(year): taxsim_vars[values[0]]}
+
     return situation
 
 
@@ -16,6 +59,8 @@ def form_household_situation(year, state, taxsim_vars):
     mappings = load_variable_mappings()["taxsim_to_policyengine"]
 
     household_situation = copy.deepcopy(mappings["household_situation"])
+    household_situation.pop("additional_tax_units", None)
+    household_situation.pop("additional_income_units", None)
 
     depx = taxsim_vars["depx"]
     mstat = taxsim_vars["mstat"]
@@ -31,8 +76,6 @@ def form_household_situation(year, state, taxsim_vars):
     household_situation["families"]["your family"]["members"] = members
     household_situation["households"]["your household"]["members"] = members
     household_situation["tax_units"]["your tax unit"]["members"] = members
-
-    household_situation = add_additional_tax_units(state.lower(), year, household_situation)
 
     household_situation["spm_units"]["your household"]["members"] = members
 
@@ -74,6 +117,8 @@ def form_household_situation(year, state, taxsim_vars):
             "age": {str(year): int(taxsim_vars.get(f"age{i}", 10))},
             "employment_income": {str(year): 0}
         }
+
+    household_situation = add_additional_units(state.lower(), year, household_situation, taxsim_vars)
 
     return household_situation
 

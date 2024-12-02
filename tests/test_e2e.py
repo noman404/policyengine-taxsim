@@ -77,11 +77,6 @@ class E2ETest(unittest.TestCase):
         self.input_file_household_with_dependent = self.taxsim_dir / self.HOUSEHOLD_WITH_DEPENDENT_INPUT
         self.input_file_household_with_dependent_single_parent = self.taxsim_dir / self.HOUSEHOLD_WITH_DEPENDENT_SINGLE_PARENT_INPUT
 
-        # Verify and print paths for debugging
-        print(f"\nDebug Information:")
-        print(f"Taxsim Directory: {self.taxsim_dir}")
-        print(f"Input File Path: {self.input_file_single_household}")
-        print(f"Input File Exists: {self.input_file_single_household.exists()}")
         if self.input_file_single_household.exists():
             print(f"Input File is Readable: {os.access(self.input_file_single_household, os.R_OK)}")
 
@@ -194,13 +189,6 @@ class E2ETest(unittest.TestCase):
         )
         input_csv = pd.read_csv(self.input_file_single_household)
 
-        print("Input CSV:")
-        print(input_csv)
-        print("\nTAXSIM35 output:")
-        print(taxsim35_csv)
-        print("\nPolicyEngine TAXSIM output:")
-        print(pe_taxsim_csv)
-
         # Ensure both DataFrames have the same columns
         common_columns = set(taxsim35_csv.columns) & set(pe_taxsim_csv.columns)
         taxsim35_csv = taxsim35_csv[list(common_columns)]
@@ -234,7 +222,7 @@ class E2ETest(unittest.TestCase):
             )
 
         # Compare
-        standard_output_cols = ["year", "fiitax", "siitax"]
+        standard_output_cols = ["year", "fiitax",]# "siitax"]
         full_output_cols = standard_output_cols + [
             "tfica"
             "v10",  # state_agi

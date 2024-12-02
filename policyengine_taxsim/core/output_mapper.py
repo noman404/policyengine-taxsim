@@ -110,6 +110,8 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                     value = f"{get_state_number(state_name)}{' ' * LEFT_MARGIN}{state_name}"
                 elif var_name == "fica":
                     value = simulate_multiple(simulation, each_variable['variables'], year)
+                elif var_name == "v27":
+                    value = simulate_multiple(simulation, each_variable['variables'], year)
                 else:
                     value = simulate(simulation, variable, year)
                     outputs.append({'variable': variable, 'value': value})
@@ -159,12 +161,23 @@ def taxsim_input_definition(data_dict, year, state_name):
 
     # Header lines using year from input data
     current_year = data_dict.get('year', year)
+    # output_lines.extend([
+    #     f"       {current_year}",
+    #     " NBER TAXSIM Model v35 (03/05/24) With TCJA",
+    #     f" State law coded through        {current_year}",
+    #     " Later state laws extrapolated from that year.",
+    #     " Marginal tax rate wrt taxpayer earnings.",
+    #     "",
+    #     "   Input Data:"
+    # ])
+
     output_lines.extend([
-        f"       {current_year}",
-        " NBER TAXSIM Model v35 (03/05/24) With TCJA",
-        f" State law coded through        {current_year}",
-        " Later state laws extrapolated from that year.",
-        " Marginal tax rate wrt taxpayer earnings.",
+        "NBER TAXSIM @(#) $Version:      241116  With TCJA",
+        f"User modifications to tax law",
+        "",
+        f"State law coded through        {current_year}",
+        "Later state laws extrapolated from that year.",
+        "Marginal rate not requested.",
         "",
         "   Input Data:"
     ])
@@ -270,7 +283,7 @@ def export_household(taxsim_input, policyengine_situation, logs):
         dict: Dictionary of TAXSIM output variables
     """
     mappings = load_variable_mappings()["policyengine_to_taxsim"]
-
+    print(policyengine_situation)
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(
