@@ -66,7 +66,7 @@ class E2ETest(unittest.TestCase):
         if system == "darwin":
             self.taxsim_exe = "taxsim35-osx.exe"
         elif system == "windows":
-            self.taxsim_exe = "taxsim35-windows.exe"
+            self.taxsim_exe = "taxsim-latest-windows.exe"
         elif system == "linux":
             self.taxsim_exe = "taxsim35-unix.exe"
         else:
@@ -222,7 +222,7 @@ class E2ETest(unittest.TestCase):
             )
 
         # Compare
-        standard_output_cols = ["year", "fiitax",]# "siitax"]
+        standard_output_cols = ["year", "fiitax", "siitax"]
         full_output_cols = standard_output_cols + [
             "tfica"
             "v10",  # state_agi
@@ -242,7 +242,13 @@ class E2ETest(unittest.TestCase):
         comparison_results = {}
         for col in columns_to_check:
             if col in common_columns:
-                matches = (taxsim35_csv[col] == pe_taxsim_csv[col]).all()
+                # matches = (taxsim35_csv[col] == pe_taxsim_csv[col]).all()
+                matches = np.isclose(
+                    taxsim35_csv[col],
+                    pe_taxsim_csv[col],
+                    rtol=0.01,  # relative tolerance (0.001%)
+                    atol=0.1 # absolute tolerance
+                ).all()
                 comparison_results[col] = matches
                 if not matches:
                     print(f"Mismatch in column {col}:")

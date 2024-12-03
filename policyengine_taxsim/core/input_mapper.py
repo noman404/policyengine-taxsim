@@ -11,7 +11,7 @@ def add_additional_units(state, year, situation, taxsim_vars):
     additional_income_units_config = load_variable_mappings()["taxsim_to_policyengine"]["household_situation"]["additional_income_units"]
 
     tax_unit = situation["tax_units"]["your tax unit"]
-    people_unit = situation["people"]["you"]
+    people_unit = situation["people"]
 
     for item in additional_tax_units_config:
         for field, values in item.items():
@@ -40,17 +40,23 @@ def add_additional_units(state, year, situation, taxsim_vars):
             if not values:
                 continue
 
-            if len(values) > 1:
+            if field == "self_employment_income":
+                if "psemp" in taxsim_vars:
+                    people_unit["you"][field] = {str(year): taxsim_vars.get("psemp", 0)}
+                if "your partner" in people_unit and "ssemp" in taxsim_vars:
+                    people_unit["your partner"][field] = {str(year): taxsim_vars.get("ssemp", 0)}
+
+            elif len(values) > 1:
                 matching_values = [
                     taxsim_vars.get(value, 0)
                     for value in values
                     if value in taxsim_vars
                 ]
                 if matching_values:
-                    people_unit[field] = {str(year): sum(matching_values)}
+                    people_unit["you"][field] = {str(year): sum(matching_values)}
 
             elif len(values) == 1 and values[0] in taxsim_vars:
-                people_unit[field] = {str(year): taxsim_vars[values[0]]}
+                people_unit["you"][field] = {str(year): taxsim_vars[values[0]]}
 
     return situation
 

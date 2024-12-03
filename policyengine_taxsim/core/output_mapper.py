@@ -8,22 +8,22 @@ from policyengine_tests_generator.core.generator import PETestsYAMLGenerator
 
 def generate_non_description_output(taxsim_output, mappings, year, state_name, simulation, output_type, logs):
     outputs = []
-    for key, value in mappings.items():
-        if value['implemented']:
+    for key, item in mappings.items():
+        if item['implemented']:
             if key == "year":
                 taxsim_output[key] = int(year)
             elif key == "state":
                 taxsim_output[key] = get_state_number(state_name)
-            elif key == "fica":
-                pe_variables = value['variables']
+            elif 'variables' in item and len(item['variables']) > 0:
+                pe_variables = item['variables']
                 taxsim_output[key] = simulate_multiple(simulation, pe_variables, year)
             else:
-                pe_variable = value['variable']
+                pe_variable = item['variable']
 
                 if "state" in pe_variable:
                     pe_variable = pe_variable.replace("state", state_name).lower()
 
-                for entry in value['idtl']:
+                for entry in item['idtl']:
                     if output_type in entry.values():
                         taxsim_output[key] = simulate(simulation, pe_variable, year)
                         outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
@@ -97,9 +97,9 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                 # Group headers are 2 tabs left of text_description
                 lines.append(f"{' ' * GROUP_MARGIN}{group_name}:")
 
-            for desc, var_name, each_variable in sorted(variables, key=lambda x: x[0]):
-                variable = each_variable['variable']
-                needs_second_column = each_variable.get('group_column', 1) == 2
+            for desc, var_name, each_item in sorted(variables, key=lambda x: x[0]):
+                variable = each_item['variable']
+                has_second_column = each_item.get('group_column', 1) == 2
 
                 if "state" in variable:
                     variable = variable.replace("state", state_name).lower()
@@ -108,10 +108,8 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                     value = year
                 elif var_name == "state":
                     value = f"{get_state_number(state_name)}{' ' * LEFT_MARGIN}{state_name}"
-                elif var_name == "fica":
-                    value = simulate_multiple(simulation, each_variable['variables'], year)
-                elif var_name == "v27":
-                    value = simulate_multiple(simulation, each_variable['variables'], year)
+                elif 'variables' in each_item and len(each_item['variables']) > 0:
+                    value = simulate_multiple(simulation, each_item['variables'], year)
                 else:
                     value = simulate(simulation, variable, year)
                     outputs.append({'variable': variable, 'value': value})
@@ -123,9 +121,9 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                     formatted_value = str(value)
 
                 # Format second column value if needed
-                if needs_second_column:
-                    if var_name == "fica":
-                        second_value = simulate_multiple(simulation_1dollar_more, each_variable['variables'], year)
+                if has_second_column:
+                    if 'variables' in each_item and len(each_item['variables']) > 0:
+                        second_value = simulate_multiple(simulation_1dollar_more, each_item['variables'], year)
                     else:
                         second_value = simulate(simulation_1dollar_more, variable, year)
 
@@ -138,7 +136,7 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                 desc_lines = desc.split('\n')
                 for desc_line_index, desc_line in enumerate(desc_lines):
                     indent = LEFT_MARGIN + LABEL_INDENT
-                    if needs_second_column:
+                    if has_second_column:
                         line = f"{' ' * indent}{desc_line:<{LABEL_WIDTH}}{formatted_value:>{VALUE_WIDTH}}"
                         if desc_line_index == 0:  # Only add second value on first line
                             line += f"{formatted_second_value:>{SECOND_VALUE_WIDTH}}"
@@ -161,15 +159,6 @@ def taxsim_input_definition(data_dict, year, state_name):
 
     # Header lines using year from input data
     current_year = data_dict.get('year', year)
-    # output_lines.extend([
-    #     f"       {current_year}",
-    #     " NBER TAXSIM Model v35 (03/05/24) With TCJA",
-    #     f" State law coded through        {current_year}",
-    #     " Later state laws extrapolated from that year.",
-    #     " Marginal tax rate wrt taxpayer earnings.",
-    #     "",
-    #     "   Input Data:"
-    # ])
 
     output_lines.extend([
         "NBER TAXSIM @(#) $Version:      241116  With TCJA",
@@ -283,7 +272,7 @@ def export_household(taxsim_input, policyengine_situation, logs):
         dict: Dictionary of TAXSIM output variables
     """
     mappings = load_variable_mappings()["policyengine_to_taxsim"]
-    print(policyengine_situation)
+
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(

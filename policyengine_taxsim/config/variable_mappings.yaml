@@ -44,7 +44,7 @@ policyengine_to_taxsim:
     full_text_group: "Basic Output"
     group_column: 1
   fica:
-    variable: use_placeholder_for_now_until_its_implemented_in_PE
+    variable: multiple_variable
     implemented: true
     idtl:
      - standard : 0
@@ -182,6 +182,7 @@ policyengine_to_taxsim:
     group_order: 3
     full_text_group: "Federal Tax Calculation"
     group_column: 2
+#    what is the result
   qbi:
     variable: qualified_business_income_deduction
     implemented: true
@@ -202,7 +203,7 @@ policyengine_to_taxsim:
     full_text_group: "Federal Tax Calculation"
     group_column: 2
   v19:
-    variable: income_tax_before_credits
+    variable: income_tax_main_rates
     implemented: true
     idtl:
      - full: 2
@@ -363,7 +364,7 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   v32:
-    variable: state_exemptions
+    variable: state_agi
     implemented: true
     idtl:
      - full: 2
@@ -373,7 +374,7 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   v33:
-    variable: na_pe
+    variable: state_exemptions
     implemented: false
     idtl:
      - full: 2
@@ -413,8 +414,8 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   tax_before_credits:
-    variable: na_pe
-    implemented: false
+    variable: state_income_tax_before_non_refundable_credits
+    implemented: true
     idtl:
      - full_text: 5
     text_description: "Tax before credits"
@@ -431,7 +432,7 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   v37:
-    variable: state_cdcc
+    variable: state_property_tax_credit
     implemented: true
     idtl:
      - full: 2
@@ -451,8 +452,8 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   v38:
-    variable: na_pe
-    implemented: false
+    variable: state_cdcc
+    implemented: true
     idtl:
      - full: 2
      - full_text: 5
@@ -529,7 +530,7 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 2
   v42:
-    variable: self_employment_income
+    variable: qualified_business_income_deduction
     implemented: true
     idtl:
      - full: 2
@@ -549,7 +550,7 @@ policyengine_to_taxsim:
     full_text_group: "Additional Medicare Taxes 2013+"
     group_column: 2
   v44:
-    variable: medicare
+    variable: multiple_variable
     implemented: true
     idtl:
      - full: 2
@@ -557,6 +558,9 @@ policyengine_to_taxsim:
     group_order: 6
     full_text_group: "Additional Medicare Taxes 2013+"
     group_column: 2
+    variables:
+      - employee_medicare_tax
+      - additional_medicare_tax
   bracket_rate_x_y_z:
     variable: na_pe
     implemented: false
@@ -620,7 +624,6 @@ policyengine_to_taxsim:
     group_order: 7
     full_text_group: "Decomposition of Federal Marginal Rate \n (taxpayer earned income) \n Regular Income Tax"
     group_column: 1
-#
   earned_income_credit:
     variable: na_pe
     implemented: false
