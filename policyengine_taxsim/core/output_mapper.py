@@ -99,7 +99,7 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                 line = f"{' ' * GROUP_MARGIN}{group_name}:"
                 padding = ' ' * (LABEL_WIDTH + LABEL_INDENT - len(group_name) - 1)  # -1 for the colon
                 base_text = f"{'Base':>8}"
-                plus_one_text = f"{'+$1':>8}"
+                plus_one_text = f"{'':>8}"
                 lines.append(f"{line}{padding}{base_text:>{VALUE_WIDTH}}{plus_one_text:>{SECOND_VALUE_WIDTH}}")
             else:
                 # Group headers are 2 tabs left of text_description
@@ -181,13 +181,6 @@ def taxsim_input_definition(data_dict, year, state_name):
     current_year = data_dict.get('year', year)
 
     output_lines.extend([
-        "NBER TAXSIM @(#) $Version:      241116  With TCJA",
-        f"User modifications to tax law",
-        "",
-        f"State law coded through        {current_year}",
-        "Later state laws extrapolated from that year.",
-        "Marginal rate not requested.",
-        "",
         "   Input Data:"
     ])
 
