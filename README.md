@@ -56,7 +56,7 @@ This project provides an emulator for TAXSIM-35, utilizing PolicyEngine's US fed
    ```
 ## Uninstall
 
-incase of any unexpected system error happens, you can uninstall the package 
+Incase of any unexpected system error happens, you can uninstall the package and reinstall it again
 
    ```bash
    pip uninstall policyengine_taxsim
@@ -76,7 +76,7 @@ Run the simulation by providing your input CSV file:
 python policyengine_taxsim/cli.py your_input_file.csv
 ```
 
-The output will be generated as `output.csv` in the same directory.
+The output will be generated as `output.txt` in the same directory.
 
 ## Input Variables
 
@@ -84,29 +84,29 @@ The emulator accepts CSV files with the following variables:
 
 ### Supported Inputs
 
-| Variable  | Description                                  | Notes                                   |
-|-----------|----------------------------------------------|-----------------------------------------|
-| taxsimid  | Unique identifier                            |                                         |
-| year      | Tax year                                     |                                         |
-| state     | State code                                   |                                         |
-| mstat     | Marital status                               | Only supports: 1 (single), 2 (joint)    |
-| page      | Primary taxpayer age                         |                                         |
-| sage      | Spouse age                                   |                                         |
-| depx      | Number of dependents                         |                                         |
-| age1      | First dependent's age                        |                                         |
-| age2      | Second dependent's age                       |                                         |
-| ageN      | Nth dependent's age                          | Taxsim only allow upto 8 children dependent |
-| pwages    | Primary taxpayer wages                       |                                        |
-| swages    | Spouse wages                                 |                                        |
-| psemp     | Self-employment income of primary taxpayer   |                                        |
-| ssemp     | Self-employment income of secondary taxpayer |                                        |
-| dividends | Dividend Income                              |                                        |
-| intrec    | Taxable Interest Received                    |                                        |
-| stcg      | Short Term Capital Gains or losses           |                                        |
-| ltcg      | Long Term Capital Gains or losses            |                                        |
-| gssi      | Gross Social Security Benefits               |                                        |
-| pensions      | Taxable Pensions and IRA distributions       |                                        |
-| rentpaid       | Rent Paid                               |                                        |
+| Variable  | Description                                  | Notes                                     |
+|-----------|----------------------------------------------|-------------------------------------------|
+| taxsimid  | Unique identifier                            |                                           |
+| year      | Tax year                                     |                                           |
+| state     | State code                                   |                                           |
+| mstat     | Marital status                               | Only supports: 1 (single), 2 (joint)      |
+| page      | Primary taxpayer age                         |                                           |
+| sage      | Spouse age                                   |                                           |
+| depx      | Number of dependents                         |                                           |
+| age1      | First dependent's age                        |                                           |
+| age2      | Second dependent's age                       |                                           |
+| ageN      | Nth dependent's age                          | Taxsim only allow upto 8 child dependents |
+| pwages    | Primary taxpayer wages                       |                                           |
+| swages    | Spouse wages                                 |                                           |
+| psemp     | Self-employment income of primary taxpayer   |                                           |
+| ssemp     | Self-employment income of secondary taxpayer |                                           |
+| dividends | Dividend Income                              |                                           |
+| intrec    | Taxable Interest Received                    |                                           |
+| stcg      | Short Term Capital Gains or losses           |                                           |
+| ltcg      | Long Term Capital Gains or losses            |                                           |
+| gssi      | Gross Social Security Benefits               |                                           |
+| pensions  | Taxable Pensions and IRA distributions       |                                           |
+| rentpaid  | Rent Paid                                    |                                           |
 
 
 ### Output Types
@@ -121,8 +121,8 @@ Depending on the idtl input value it can generate output types as following:
 
 ### Household Types
 
-| Supported household types                |
-|----------------------------------------|
+| Supported household types               |
+|-----------------------------------------|
 | Single                                  |
 | Joint                                   |
 | Household with Dependent                |
