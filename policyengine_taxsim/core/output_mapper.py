@@ -395,7 +395,7 @@ def export_household(taxsim_input, policyengine_situation, logs):
 
 def simulate(simulation, variable, year):
     try:
-        return to_roundedup_number(simulation.calculate(variable, period=year))
+        return to_roundedup_number(sum(simulation.calculate(variable, period=year)))
     except Exception as error:
         print(error)
         return 0.00
@@ -411,7 +411,12 @@ def simulate_to_decide(simulation, variable, year) -> bool:
 
 def simulate_multiple(simulation, variables, year, state):
     try:
-        total = sum(to_roundedup_number(simulation.calculate(variable.replace("state", state), period=year)) for variable in variables)
+        total = to_roundedup_number(
+            sum(
+                sum(simulation.calculate(variable.replace("state", state), period=year))
+                for variable in variables
+            )
+        )
     except Exception as error:
         print(error)
         total = 0.00
