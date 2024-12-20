@@ -62,8 +62,9 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                                 taxsim_output[key] = simulate(simulation, pe_variable, year)
 
                                 outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
+                            continue
 
-                        elif 'pre_simulation' in each_item:
+                        if 'pre_simulation' in each_item:
                             found_state = next((each for each in each_item['pre_simulation'] if state_initial in each),
                                                None)
                             if found_state and found_state[state_initial]['implemented']:
@@ -183,8 +184,9 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                             value = simulate(simulation, variable, year)
 
                             outputs.append({'variable': variable, 'value': value})
+                        continue
 
-                    elif 'pre_simulation' in each_item:
+                    if 'pre_simulation' in each_item:
                         found_state = next((each for each in each_item['pre_simulation'] if state_initial in each),
                                            None)
                         if found_state and found_state[state_initial]['implemented']:
@@ -224,7 +226,8 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                                                                                                                 state_initial][
                                                                                                                 'variable'] else \
                                 found_state[state_initial]['variable']
-                        second_value = simulate(simulation_1dollar_more, variable, year)
+                                second_value = simulate(simulation_1dollar_more, variable, year)
+                            continue
 
                     if isinstance(second_value, (int, float)):
                         formatted_second_value = f"{second_value:>8.1f}"
@@ -411,7 +414,7 @@ def simulate_to_decide(simulation, variable, year) -> bool:
 
 def simulate_multiple(simulation, variables, year, state):
     try:
-        total = to_roundedup_number(
+        return to_roundedup_number(
             sum(
                 sum(simulation.calculate(variable.replace("state", state), period=year))
                 for variable in variables
@@ -419,5 +422,4 @@ def simulate_multiple(simulation, variables, year, state):
         )
     except Exception as error:
         print(error)
-        total = 0.00
-    return to_roundedup_number(total)
+        return 0.00
