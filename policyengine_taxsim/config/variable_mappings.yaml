@@ -836,8 +836,6 @@ taxsim_to_policyengine:
           - 'il'
           - 'in'
           - 'ok'
-      - deductible_mortgage_interest:
-          - mortgage
     additional_income_units:
       - taxable_interest_income:
           - intrec
@@ -862,6 +860,8 @@ taxsim_to_policyengine:
           - stcg
       - social_security_retirement:
           - gssi
+      - deductible_mortgage_interest:
+          - mortgage
 
 taxsim_input_definition:
   - taxsimid:
