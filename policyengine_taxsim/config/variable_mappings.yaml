@@ -439,7 +439,7 @@ policyengine_to_taxsim:
           implemented: true
           pre_variable: de_files_separately
           variables:
-            - de_standard_deduction_indiv
+            - de_standard_deduction_indv
             - de_standard_deduction_joint
       - ia:
           implemented: true
@@ -494,11 +494,14 @@ policyengine_to_taxsim:
           variables:
             - ky_itemized_deductions_indiv
             - ky_itemized_deductions_joint
+      - de:
+          implemented: true
+          pre_variable: de_files_separately
+          variables:
+            - de_itemized_deductions_indv
+            - de_itemized_deductions_joint
     special_cases:
       - il:
-          implemented: false
-          variable: na_pe
-      - de:
           implemented: false
           variable: na_pe
       - tx:
@@ -546,10 +549,12 @@ policyengine_to_taxsim:
           variables:
             - ky_taxable_income_indiv
             - ky_taxable_income_joint
-    special_cases:
       - de:
-          implemented: false
-          variable: na_pe
+          implemented: true
+          pre_variable: de_files_separately
+          variables:
+            - de_taxable_income_indv
+            - de_taxable_income_joint
   tax_before_credits:
     variable: state_income_tax_before_non_refundable_credits
     implemented: true
@@ -578,11 +583,14 @@ policyengine_to_taxsim:
           variables:
             - ky_income_tax_before_non_refundable_credits_indiv
             - ky_income_tax_before_non_refundable_credits_joint
+      - de:
+          implemented: true
+          pre_variable: de_files_separately
+          variables:
+            - de_income_tax_before_non_refundable_credits_indv
+            - de_income_tax_before_non_refundable_credits_joint
     special_cases:
       - ms:
-          implemented: false
-          variable: na_pe
-      - de:
           implemented: false
           variable: na_pe
       - ia:
@@ -688,12 +696,8 @@ policyengine_to_taxsim:
     full_text_group: "State Tax Calculation"
     group_column: 1
     variables:
-      - state_non_refundable_credit
+      - state_non_refundable_credits
       - state_refundable_credits
-    special_cases:
-      - ms:
-          implemented: false
-          variable: na_pe
   energy_fuel_credit2:
     variable: na_pe
     implemented: false

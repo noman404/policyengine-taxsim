@@ -78,12 +78,10 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                                     pe_variable = variables[1]
 
                                 taxsim_output[key] = simulate(simulation, pe_variable, year)
-
                                 outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
 
                         else:
                             taxsim_output[key] = simulate(simulation, pe_variable, year)
-
                             outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
 
     file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
@@ -193,7 +191,6 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                             pre_simulation_variable = found_state[state_initial]['pre_variable']
                             use_indiv = simulate_to_decide(simulation, pre_simulation_variable, year)
                             variables = found_state[state_initial]['variables']
-                            print('use indiv', use_indiv)
                             if use_indiv:
                                 value = simulate(simulation, variables[0], year)
                             else:
