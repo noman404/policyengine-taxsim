@@ -504,10 +504,6 @@ policyengine_to_taxsim:
       - il:
           implemented: false
           variable: na_pe
-      - tx:
-          implemented: false
-          variable: na_pe
-
   v36:
     variable: state_taxable_income
     implemented: true
