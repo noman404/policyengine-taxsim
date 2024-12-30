@@ -110,6 +110,7 @@ The emulator accepts CSV files with the following variables:
 | gssi      | Gross Social Security Benefits                             |                                                                                   |
 | pensions  | Taxable Pensions and IRA distributions                     |                                                                                   |
 | rentpaid  | Rent Paid                                                  |                                                                                   |
+| mortgage  | Mortgage Interest                                          |                                                                                   |
 
 
 ### Output Types
