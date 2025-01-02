@@ -32,8 +32,11 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                                                                                                            'variable'] else \
                             found_state[state_initial]['variable']
                         taxsim_output[key] = simulate(simulation, pe_variable, year)
-
                         outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
+                    else:
+                        taxsim_output[key] = 0.0
+                        outputs.append({'variable': 'n/a', 'value': taxsim_output[key]})
+
                 else:
                     taxsim_output[key] = simulate_multiple(simulation, pe_variables, year, state_initial)
 
@@ -60,9 +63,10 @@ def generate_non_description_output(taxsim_output, mappings, year, state_name, s
                                                                                                                    'variable'] else \
                                 found_state[state_initial]['variable']
                                 taxsim_output[key] = simulate(simulation, pe_variable, year)
-
                                 outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
-                            continue
+                            else:
+                                taxsim_output[key] = 0.0
+                                outputs.append({'variable': 'n/a', 'value': taxsim_output[key]})
 
                         if 'pre_simulation' in each_item:
                             found_state = next((each for each in each_item['pre_simulation'] if state_initial in each),

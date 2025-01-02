@@ -54,6 +54,28 @@ policyengine_to_taxsim:
     group_order: 1
     full_text_group: "Basic Output"
     group_column: 1
+    special_cases:
+      - ak:
+          implemented: false
+          variable: na_pe
+      - fl:
+          implemented: false
+          variable: na_pe
+      - nv:
+          implemented: false
+          variable: na_pe
+      - sd:
+          implemented: false
+          variable: na_pe
+      - tn:
+          implemented: false
+          variable: na_pe
+      - tx:
+          implemented: false
+          variable: na_pe
+      - wy:
+          implemented: false
+          variable: na_pe
   fica:
     variable: multiple_variable
     implemented: true
