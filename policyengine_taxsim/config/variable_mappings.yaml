@@ -1062,4 +1062,3 @@ taxsim_input_definition:
       name: "27. Txpy/Spouse QBI w/o PO"
   - pprofinc:
       name: "28. Txpy/Spouse SSTB w PO"
-
