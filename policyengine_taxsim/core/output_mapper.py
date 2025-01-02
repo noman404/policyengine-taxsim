@@ -316,6 +316,7 @@ def export_household(taxsim_input, policyengine_situation, logs):
 
 def simulate(simulation, variable, year):
     try:
+        simulation.set_input(variable_name='salt_deduction', value=0.0)
         return to_roundedup_number(simulation.calculate(variable, period=year))
     except Exception as error:
         return 0.00
@@ -323,6 +324,7 @@ def simulate(simulation, variable, year):
 
 def simulate_multiple(simulation, variables, year):
     try:
+        simulation.set_input(variable_name='salt_deduction', value=0.0)
         total = sum(to_roundedup_number(simulation.calculate(variable, period=year)) for variable in variables)
     except Exception as error:
         total = 0.00
