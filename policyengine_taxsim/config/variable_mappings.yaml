@@ -997,3 +997,69 @@ taxsim_to_policyengine:
           - stcg
       - social_security_retirement:
           - gssi
+      - deductible_mortgage_interest:
+          - mortgage
+
+taxsim_input_definition:
+  - taxsimid:
+      name: "1. Record ID"
+  - year:
+      name: "2. Tax Year"
+  - state:
+      name: "3. State Code"
+  - mstat:
+      name: "4. Marital Status"
+      type:
+        - single: 1
+        - joint: 2
+  - page:
+      name: "5. Age (Txpyr/Spouse)"
+      pair: sage
+  - dependent_exemption:
+      name: "6. Dependent Exemptions"
+  - depx:
+      name: "8. #deps for CCC/CTC/EIC"
+  - pwages:
+      name: "9. Wages (Txpyr/Spouse)"
+      pair: swages
+  - psemp:
+      name: "10. Self-employment income"
+      pair: ssemp
+  - dividends:
+      name: "11. Dividend Income"
+  - intrec:
+      name: "12. Interest Received"
+  - stcg:
+      name: "13. Short Term Gains"
+  - ltcg:
+      name: "14. Long Term Gains"
+  - otherprop:
+      name: "15. Other Property"
+  - nonprop:
+      name: "16. Other Non-Property"
+  - pensions:
+      name: "17. Taxable Pensions"
+  - gssi:
+      name: "18. Gross Social Security"
+  - pui:
+      name: "19. Tot/Txpy/Spouse UI"
+      pair: sui
+  - transfers:
+      name: "20. Non-taxable Transfers"
+  - rentpaid:
+      name: "21. Rent Paid"
+  - proptax:
+      name: "22. Property Taxes Paid"
+  - otheritem:
+      name: "23. Other Itemized Deds"
+  - childcare:
+      name: "24. Child Care Expenses"
+  - mortgage:
+      name: "25. Mortgage Interest"
+  - scorp:
+      name: "26. S-Corp profits"
+  - pbusinc:
+      name: "27. Txpy/Spouse QBI w/o PO"
+  - pprofinc:
+      name: "28. Txpy/Spouse SSTB w PO"
+
