@@ -58,9 +58,6 @@ policyengine_to_taxsim:
       - ak:
           implemented: false
           variable: na_pe
-      - fl:
-          implemented: false
-          variable: na_pe
       - nv:
           implemented: false
           variable: na_pe
@@ -73,7 +70,13 @@ policyengine_to_taxsim:
       - tx:
           implemented: false
           variable: na_pe
+      - fl:
+          implemented: false
+          variable: na_pe
       - wy:
+          implemented: false
+          variable: na_pe
+      - wa:
           implemented: false
           variable: na_pe
   fica:
@@ -408,16 +411,6 @@ policyengine_to_taxsim:
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 1
-    special_cases:
-      - mn:
-          implemented: false
-          variable: na_pe
-      - ia:
-          implemented: false
-          variable: na_pe
-      - il:
-          implemented: true
-          variable: state_base_income
   v33:
     variable: state_exemptions
     implemented: false
@@ -522,10 +515,6 @@ policyengine_to_taxsim:
           variables:
             - de_itemized_deductions_indv
             - de_itemized_deductions_joint
-    special_cases:
-      - il:
-          implemented: false
-          variable: na_pe
   v36:
     variable: state_taxable_income
     implemented: true
@@ -607,13 +596,6 @@ policyengine_to_taxsim:
           variables:
             - de_income_tax_before_non_refundable_credits_indv
             - de_income_tax_before_non_refundable_credits_joint
-    special_cases:
-      - ms:
-          implemented: false
-          variable: na_pe
-      - ia:
-          implemented: false
-          variable: na_pe
   v41:
     variable: na_pe
     implemented: false
@@ -633,16 +615,6 @@ policyengine_to_taxsim:
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 1
-    special_cases:
-      - mn:
-          implemented: false
-          variable: na_pe
-      - ms:
-          implemented: false
-          variable: na_pe
-      - ia:
-          implemented: false
-          variable: na_pe
   rent_credit:
     variable: na_pe
     implemented: false
@@ -663,10 +635,6 @@ policyengine_to_taxsim:
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 1
-    special_cases:
-      - il:
-          implemented: false
-          variable: na_pe
   v39:
     variable: state_eitc
     implemented: true
@@ -677,10 +645,6 @@ policyengine_to_taxsim:
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 1
-    special_cases:
-      - ms:
-          implemented: false
-          variable: na_pe
   energy_fuel_credit:
     variable: na_pe
     implemented: false
@@ -699,10 +663,6 @@ policyengine_to_taxsim:
     group_order: 4
     full_text_group: "State Tax Calculation"
     group_column: 1
-    special_cases:
-      - mn:
-          implemented: false
-          variable: na_pe
   v40:
     variable: multiple_variables
     implemented: true
