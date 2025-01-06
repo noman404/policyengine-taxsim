@@ -38,27 +38,29 @@ def main(input_file, output, logs, disable_salt):
         for _, row in df.iterrows():
             taxsim_input = row.to_dict()
             pe_situation = generate_household(taxsim_input)
+
+            taxsim_output = export_household(taxsim_input, pe_situation, logs)
+
             idtl = taxsim_input['idtl']
             if idtl == 0:
-                taxsim_output = export_household(taxsim_input, pe_situation, logs, disable_salt)
                 idtl_0_results.append(taxsim_output)
             elif idtl == 2:
-                taxsim_output = export_household(taxsim_input, pe_situation, logs, disable_salt)
                 idtl_2_results.append(taxsim_output)
             else:
-                taxsim_output = export_household(taxsim_input, pe_situation, logs, disable_salt)
                 idtl_5_results += taxsim_output
 
-        # Create output dataframe and save to csv
         idtl_0_output = to_csv_str(idtl_0_results)
         idtl_2_output = to_csv_str(idtl_2_results)
 
-        output_path = Path(output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_str = ""
+        if idtl_0_output:
+            output_str += idtl_0_output
+        if idtl_2_output:
+            output_str += f"\n{idtl_2_output}"
+        if idtl_5_results:
+            output_str += f"\n{idtl_5_results}"
 
-        with open(output_path, 'w', encoding='utf-8') as txt_file:
-            txt_file.write(f"{idtl_0_output}\n{idtl_2_output}\n{idtl_5_results}")
-        click.echo(f"Output saved to {output}")
+        print(output_str)
     except Exception as e:
         click.echo(f"Error processing input: {str(e)}", err=True)
         raise
