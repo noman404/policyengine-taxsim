@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import sys
 import os
+from io import StringIO
 
 
 # Delay imports until runtime
@@ -38,28 +39,55 @@ def main(input_file, output, logs):
     """
     try:
         # Get mapper functions at runtime
-        import_single_household, export_single_household = get_mappers()
+        generate_household, export_household = get_mappers()
 
         # Read input file
         df = pd.read_csv(input_file)
 
         # Process each row
-        results = []
+        idtl_0_results = []
+        idtl_2_results = []
+        idtl_5_results = ""
+
         for _, row in df.iterrows():
             taxsim_input = row.to_dict()
-            pe_situation = import_single_household(taxsim_input)
-            taxsim_output = export_single_household(taxsim_input, pe_situation, logs)
-            results.append(taxsim_output)
+            pe_situation = generate_household(taxsim_input)
 
-        # Create output dataframe and save to csv
-        output_df = pd.DataFrame(results)
-        output_path = Path(output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_df.to_csv(output_path, index=False)
-        click.echo(f"Output saved to {output}")
+            taxsim_output = export_household(taxsim_input, pe_situation, logs)
+
+            idtl = taxsim_input['idtl']
+            if idtl == 0:
+                idtl_0_results.append(taxsim_output)
+            elif idtl == 2:
+                idtl_2_results.append(taxsim_output)
+            else:
+                idtl_5_results += taxsim_output
+
+        idtl_0_output = to_csv_str(idtl_0_results)
+        idtl_2_output = to_csv_str(idtl_2_results)
+
+        output_str = ""
+        if idtl_0_output:
+            output_str += idtl_0_output
+        if idtl_2_output:
+            output_str += f"\n{idtl_2_output}"
+        if idtl_5_results:
+            output_str += f"\n{idtl_5_results}"
+
+        print(output_str)
     except Exception as e:
         click.echo(f"Error processing input: {str(e)}", err=True)
         raise
+
+
+def to_csv_str(results):
+    if len(results) == 0 or results is None:
+        return ""
+
+    df = pd.DataFrame(results)
+    content = df.to_csv(index=False, float_format='%.1f', lineterminator='\n')
+    cleaned_df = pd.read_csv(StringIO(content))
+    return cleaned_df.to_csv(index=False, lineterminator='\n')
 
 
 if __name__ == "__main__":
