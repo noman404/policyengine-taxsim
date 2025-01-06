@@ -39,7 +39,7 @@ def main(input_file, output, logs, disable_salt):
             taxsim_input = row.to_dict()
             pe_situation = generate_household(taxsim_input)
 
-            taxsim_output = export_household(taxsim_input, pe_situation, logs)
+            taxsim_output = export_household(taxsim_input, pe_situation, logs, disable_salt)
 
             idtl = taxsim_input['idtl']
             if idtl == 0:
