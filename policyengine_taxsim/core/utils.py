@@ -5,9 +5,7 @@ from pathlib import Path
 
 def load_variable_mappings():
     """Load variable mappings from YAML file."""
-    config_path = (
-            Path(__file__).parent.parent / "config" / "variable_mappings.yaml"
-    )
+    config_path = Path(__file__).parent.parent / "config" / "variable_mappings.yaml"
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
 
@@ -75,18 +73,14 @@ def get_state_code(state_number):
 def get_state_number(state_code):
     """Convert state code to state number."""
     state_mapping_reverse = {v: k for k, v in STATE_MAPPING.items()}
-    return state_mapping_reverse.get(
-        state_code, 0
-    )  # Return 0 for invalid state codes
+    return state_mapping_reverse.get(state_code, 0)  # Return 0 for invalid state codes
 
 
 def is_date(string):
     """Check if a string represents a valid year."""
     try:
         year = int(string)
-        return (
-                1900 <= year <= 2100
-        )  # Assuming years between 1900 and 2100 are valid
+        return 1900 <= year <= 2100  # Assuming years between 1900 and 2100 are valid
     except ValueError:
         return False
 
@@ -109,6 +103,6 @@ def get_ordinal(n):
         7: "seventh",
         8: "eighth",
         9: "ninth",
-        10: "tenth"
+        10: "tenth",
     }
     return ordinals.get(n, f"{n}th")

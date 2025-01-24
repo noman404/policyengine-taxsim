@@ -1,40 +1,61 @@
 from .utils import (
     load_variable_mappings,
-    get_state_number, to_roundedup_number,
+    get_state_number,
+    to_roundedup_number,
 )
 from policyengine_us import Simulation
 from policyengine_tests_generator.core.generator import PETestsYAMLGenerator
 
 
-def generate_non_description_output(taxsim_output, mappings, year, state_name, simulation, output_type, logs):
+def generate_non_description_output(
+    taxsim_output, mappings, year, state_name, simulation, output_type, logs
+):
     outputs = []
     for key, each_item in mappings.items():
-        if each_item['implemented']:
+        if each_item["implemented"]:
             if key == "taxsimid":
                 taxsim_output[key] = taxsim_output["taxsimid"]
             elif key == "year":
                 taxsim_output[key] = int(year)
             elif key == "state":
                 taxsim_output[key] = get_state_number(state_name)
-            elif 'variables' in each_item and len(each_item['variables']) > 0:
-                pe_variables = each_item['variables']
+            elif "variables" in each_item and len(each_item["variables"]) > 0:
+                pe_variables = each_item["variables"]
                 taxsim_output[key] = simulate_multiple(simulation, pe_variables, year)
             else:
-                pe_variable = each_item['variable']
+                pe_variable = each_item["variable"]
                 state_initial = state_name.lower()
 
                 if "state" in pe_variable:
                     pe_variable = pe_variable.replace("state", state_initial)
 
-                for entry in each_item['idtl']:
+                for entry in each_item["idtl"]:
                     if output_type in entry.values():
 
-                        if 'special_cases' in each_item:
-                            found_state = next((each for each in each_item['special_cases'] if state_initial in each), None)
-                            if found_state and found_state[state_initial]['implemented']:
-                                pe_variable = found_state[state_initial]['variable'].replace("state", state_initial) if "state" in found_state[state_initial]['variable'] else found_state[state_initial]['variable']
+                        if "special_cases" in each_item:
+                            found_state = next(
+                                (
+                                    each
+                                    for each in each_item["special_cases"]
+                                    if state_initial in each
+                                ),
+                                None,
+                            )
+                            if (
+                                found_state
+                                and found_state[state_initial]["implemented"]
+                            ):
+                                pe_variable = (
+                                    found_state[state_initial]["variable"].replace(
+                                        "state", state_initial
+                                    )
+                                    if "state" in found_state[state_initial]["variable"]
+                                    else found_state[state_initial]["variable"]
+                                )
                         taxsim_output[key] = simulate(simulation, pe_variable, year)
-                        outputs.append({'variable': pe_variable, 'value': taxsim_output[key]})
+                        outputs.append(
+                            {"variable": pe_variable, "value": taxsim_output[key]}
+                        )
 
     file_name = f"{taxsim_output['taxsimid']}-{state_name}.yaml"
     generate_pe_tests_yaml(simulation.situation_input, outputs, file_name, logs)
@@ -46,27 +67,26 @@ def generate_pe_tests_yaml(household, outputs, file_name, logs):
     if logs:
         generator = PETestsYAMLGenerator()
         yaml_data = generator.generate_yaml(
-            household_data=household,
-            name=file_name,
-            pe_outputs=outputs
+            household_data=household, name=file_name, pe_outputs=outputs
         )
         output = generator._get_yaml(yaml_data)
         with open(file_name, "w") as f:
             f.write(output)
 
 
-def generate_text_description_output(taxsim_input, mappings, year, state_name, simulation, simulation_1dollar_more,
-                                     logs):
+def generate_text_description_output(
+    taxsim_input, mappings, year, state_name, simulation, simulation_1dollar_more, logs
+):
     groups = {}
     group_orders = {}
 
     for var_name, var_info in mappings.items():
         if (
-                "full_text_group" in var_info
-                and "text_description" in var_info
-                and "implemented" in var_info
-                and var_info["implemented"] is True
-                and any(item.get("full_text", 0) == 5 for item in var_info["idtl"])
+            "full_text_group" in var_info
+            and "text_description" in var_info
+            and "implemented" in var_info
+            and var_info["implemented"] is True
+            and any(item.get("full_text", 0) == 5 for item in var_info["idtl"])
         ):
             group = var_info["full_text_group"]
             group_order = var_info["group_order"]
@@ -92,15 +112,21 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
         variables = groups[group_name]
         if variables:
             # Check if this group has any variables with group_column = 2
-            has_second_column = any(var_info.get('group_column', 1) == 2 for _, _, var_info in variables)
+            has_second_column = any(
+                var_info.get("group_column", 1) == 2 for _, _, var_info in variables
+            )
 
             if has_second_column:
                 # Group headers are 2 tabs left of text_description
                 line = f"{' ' * GROUP_MARGIN}{group_name}:"
-                padding = ' ' * (LABEL_WIDTH + LABEL_INDENT - len(group_name) - 1)  # -1 for the colon
+                padding = " " * (
+                    LABEL_WIDTH + LABEL_INDENT - len(group_name) - 1
+                )  # -1 for the colon
                 base_text = f"{'Base':>8}"
                 plus_one_text = f"{'':>8}"
-                lines.append(f"{line}{padding}{base_text:>{VALUE_WIDTH}}{plus_one_text:>{SECOND_VALUE_WIDTH}}")
+                lines.append(
+                    f"{line}{padding}{base_text:>{VALUE_WIDTH}}{plus_one_text:>{SECOND_VALUE_WIDTH}}"
+                )
             else:
                 # Group headers are 2 tabs left of text_description
                 lines.append(f"{' ' * GROUP_MARGIN}{group_name}:")
@@ -108,26 +134,41 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
             state_initial = state_name.lower()
 
             for desc, var_name, each_item in sorted(variables, key=lambda x: x[0]):
-                variable = each_item['variable']
-                has_second_column = each_item.get('group_column', 1) == 2
+                variable = each_item["variable"]
+                has_second_column = each_item.get("group_column", 1) == 2
 
                 if "state" in variable:
                     variable = variable.replace("state", state_name).lower()
                 if var_name == "taxsimid":
-                    value = taxsim_input['taxsimid']
+                    value = taxsim_input["taxsimid"]
                 elif var_name == "year":
                     value = year
                 elif var_name == "state":
-                    value = f"{get_state_number(state_name)}{' ' * LEFT_MARGIN}{state_name}"
-                elif 'variables' in each_item and len(each_item['variables']) > 0:
-                    value = simulate_multiple(simulation, each_item['variables'], year)
+                    value = (
+                        f"{get_state_number(state_name)}{' ' * LEFT_MARGIN}{state_name}"
+                    )
+                elif "variables" in each_item and len(each_item["variables"]) > 0:
+                    value = simulate_multiple(simulation, each_item["variables"], year)
                 else:
-                    if 'special_cases' in each_item:
-                        found_state = next((each for each in each_item['special_cases'] if state_initial in each), None)
-                        if found_state and found_state[state_initial]['implemented']:
-                            variable = found_state[state_initial]['variable'].replace("state", state_initial) if "state" in found_state[state_initial]['variable'] else found_state[state_initial]['variable']
+                    if "special_cases" in each_item:
+                        found_state = next(
+                            (
+                                each
+                                for each in each_item["special_cases"]
+                                if state_initial in each
+                            ),
+                            None,
+                        )
+                        if found_state and found_state[state_initial]["implemented"]:
+                            variable = (
+                                found_state[state_initial]["variable"].replace(
+                                    "state", state_initial
+                                )
+                                if "state" in found_state[state_initial]["variable"]
+                                else found_state[state_initial]["variable"]
+                            )
                     value = simulate(simulation, variable, year)
-                    outputs.append({'variable': variable, 'value': value})
+                    outputs.append({"variable": variable, "value": value})
 
                 # Format the base value
                 if isinstance(value, (int, float)):
@@ -137,14 +178,31 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
 
                 # Format second column value if needed
                 if has_second_column:
-                    if 'variables' in each_item and len(each_item['variables']) > 0:
-                        second_value = simulate_multiple(simulation_1dollar_more, each_item['variables'], year)
+                    if "variables" in each_item and len(each_item["variables"]) > 0:
+                        second_value = simulate_multiple(
+                            simulation_1dollar_more, each_item["variables"], year
+                        )
                     else:
-                        if 'special_cases' in each_item:
-                            found_state = next((each for each in each_item['special_cases'] if state_initial in each),
-                                               None)
-                            if found_state and found_state[state_initial]['implemented']:
-                                variable = found_state[state_initial]['variable'].replace("state", state_initial) if "state" in found_state[state_initial]['variable'] else found_state[state_initial]['variable']
+                        if "special_cases" in each_item:
+                            found_state = next(
+                                (
+                                    each
+                                    for each in each_item["special_cases"]
+                                    if state_initial in each
+                                ),
+                                None,
+                            )
+                            if (
+                                found_state
+                                and found_state[state_initial]["implemented"]
+                            ):
+                                variable = (
+                                    found_state[state_initial]["variable"].replace(
+                                        "state", state_initial
+                                    )
+                                    if "state" in found_state[state_initial]["variable"]
+                                    else found_state[state_initial]["variable"]
+                                )
                         second_value = simulate(simulation_1dollar_more, variable, year)
 
                     if isinstance(second_value, (int, float)):
@@ -153,7 +211,7 @@ def generate_text_description_output(taxsim_input, mappings, year, state_name, s
                         formatted_second_value = str(second_value)
 
                 # Handle multi-line descriptions
-                desc_lines = desc.split('\n')
+                desc_lines = desc.split("\n")
                 for desc_line_index, desc_line in enumerate(desc_lines):
                     indent = LEFT_MARGIN + LABEL_INDENT
                     if has_second_column:
@@ -178,11 +236,9 @@ def taxsim_input_definition(data_dict, year, state_name):
     mappings = load_variable_mappings()["taxsim_input_definition"]
 
     # Header lines using year from input data
-    current_year = data_dict.get('year', year)
+    current_year = data_dict.get("year", year)
 
-    output_lines.extend([
-        "   Input Data:"
-    ])
+    output_lines.extend(["   Input Data:"])
 
     # Configuration for formatting
     LEFT_MARGIN = 4
@@ -198,10 +254,10 @@ def taxsim_input_definition(data_dict, year, state_name):
         # Check if field exists in data_dict
         if field in data_dict:
             value = data_dict[field]
-            name = config['name']
+            name = config["name"]
             # Handle paired fields
-            if 'pair' in config and config['pair'] in data_dict:
-                pair_field = config['pair']
+            if "pair" in config and config["pair"] in data_dict:
+                pair_field = config["pair"]
                 pair_value = data_dict[pair_field]
 
                 indent = LEFT_MARGIN + LABEL_INDENT
@@ -212,39 +268,49 @@ def taxsim_input_definition(data_dict, year, state_name):
                 # Format and append the line
                 indent = LEFT_MARGIN + LABEL_INDENT
 
-                if field == 'mstat' and 'type' in config:
+                if field == "mstat" and "type" in config:
                     try:
                         if isinstance(value, str):
-                            if value.lower() == 'single':
+                            if value.lower() == "single":
                                 output_lines.append(
-                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{1:>{VALUE_WIDTH}.2f} {value.lower()}")
+                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{1:>{VALUE_WIDTH}.2f} {value.lower()}"
+                                )
                                 value = 1
-                            elif value.lower() == 'joint':
+                            elif value.lower() == "joint":
                                 output_lines.append(
-                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{2:>{VALUE_WIDTH}.2f} {value.lower()}")
+                                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{2:>{VALUE_WIDTH}.2f} {value.lower()}"
+                                )
                                 value = 2
                     except (ValueError, AttributeError) as e:
                         print(e)
 
                 if field == "state":
-                    output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{value:>{VALUE_WIDTH}.2f} {state_name}")
+                    output_lines.append(
+                        f"{' ' * indent}{name:<{LABEL_WIDTH}}{value:>{VALUE_WIDTH}.2f} {state_name}"
+                    )
                 else:
                     try:
                         float_value = float(value)
-                        output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{float_value:>{VALUE_WIDTH}.2f}")
+                        output_lines.append(
+                            f"{' ' * indent}{name:<{LABEL_WIDTH}}{float_value:>{VALUE_WIDTH}.2f}"
+                        )
                     except (ValueError, TypeError):
-                        output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{str(value):>{VALUE_WIDTH}}")
+                        output_lines.append(
+                            f"{' ' * indent}{name:<{LABEL_WIDTH}}{str(value):>{VALUE_WIDTH}}"
+                        )
         else:
             # If field doesn't exist in data_dict, output zero
-            name = config['name']
+            name = config["name"]
             indent = LEFT_MARGIN + LABEL_INDENT
             # Handle paired fields that don't exist
-            if 'pair' in config:
+            if "pair" in config:
                 line = f"{' ' * indent}{name:<{LABEL_WIDTH}}{0:>{VALUE_WIDTH}.2f}"
                 line += f"{0:>{SECOND_VALUE_WIDTH}.2f}"
                 output_lines.append(line)
             else:
-                output_lines.append(f"{' ' * indent}{name:<{LABEL_WIDTH}}{0:>{VALUE_WIDTH}.2f}")
+                output_lines.append(
+                    f"{' ' * indent}{name:<{LABEL_WIDTH}}{0:>{VALUE_WIDTH}.2f}"
+                )
 
     return "\n".join(output_lines)
 
@@ -289,28 +355,38 @@ def export_household(taxsim_input, policyengine_situation, logs):
     simulation = Simulation(situation=policyengine_situation)
 
     year = list(
-        policyengine_situation["households"]["your household"][
-            "state_name"
-        ].keys()
+        policyengine_situation["households"]["your household"]["state_name"].keys()
     )[0]
 
-    state_name = policyengine_situation["households"]["your household"][
-        "state_name"
-    ][year]
+    state_name = policyengine_situation["households"]["your household"]["state_name"][
+        year
+    ]
 
     taxsim_output = {}
-    taxsim_output["taxsimid"] = policyengine_situation.get("taxsimid", taxsim_input['taxsimid'])
+    taxsim_output["taxsimid"] = policyengine_situation.get(
+        "taxsimid", taxsim_input["taxsimid"]
+    )
     output_type = taxsim_input["idtl"]
 
     if int(output_type) in [0, 2]:
-        return generate_non_description_output(taxsim_output, mappings, year, state_name, simulation,
-                                               output_type, logs)
+        return generate_non_description_output(
+            taxsim_output, mappings, year, state_name, simulation, output_type, logs
+        )
     else:
-        input_definitions_lines = taxsim_input_definition(taxsim_input, year, state_name)
+        input_definitions_lines = taxsim_input_definition(
+            taxsim_input, year, state_name
+        )
         a_dollar_more_situation = add_a_dollar(policyengine_situation)
         simulation_a_dollar_more = Simulation(situation=a_dollar_more_situation)
-        output = generate_text_description_output(taxsim_input, mappings, year, state_name, simulation,
-                                                  simulation_a_dollar_more, logs)
+        output = generate_text_description_output(
+            taxsim_input,
+            mappings,
+            year,
+            state_name,
+            simulation,
+            simulation_a_dollar_more,
+            logs,
+        )
         return f"{input_definitions_lines}\n{output}\n"
 
 
@@ -323,7 +399,10 @@ def simulate(simulation, variable, year):
 
 def simulate_multiple(simulation, variables, year):
     try:
-        total = sum(to_roundedup_number(simulation.calculate(variable, period=year)) for variable in variables)
+        total = sum(
+            to_roundedup_number(simulation.calculate(variable, period=year))
+            for variable in variables
+        )
     except Exception as error:
         total = 0.00
     return to_roundedup_number(total)
