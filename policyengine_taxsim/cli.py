@@ -20,7 +20,7 @@ except ImportError:
     default="output.txt",
     help="Output file path",
 )
-@click.option('--logs', is_flag=True, help='Generate PE YAML Tests Logs')
+@click.option("--logs", is_flag=True, help="Generate PE YAML Tests Logs")
 def main(input_file, output, logs):
     """
     Process TAXSIM input file and generate PolicyEngine-compatible output.
@@ -40,7 +40,7 @@ def main(input_file, output, logs):
 
             taxsim_output = export_household(taxsim_input, pe_situation, logs)
 
-            idtl = taxsim_input['idtl']
+            idtl = taxsim_input["idtl"]
             if idtl == 0:
                 idtl_0_results.append(taxsim_output)
             elif idtl == 2:
@@ -70,9 +70,9 @@ def to_csv_str(results):
         return ""
 
     df = pd.DataFrame(results)
-    content = df.to_csv(index=False, float_format='%.1f', lineterminator='\n')
+    content = df.to_csv(index=False, float_format="%.1f", lineterminator="\n")
     cleaned_df = pd.read_csv(StringIO(content))
-    return cleaned_df.to_csv(index=False, lineterminator='\n')
+    return cleaned_df.to_csv(index=False, lineterminator="\n")
 
 
 if __name__ == "__main__":

@@ -1,14 +1,19 @@
 from .utils import (
     load_variable_mappings,
-    get_state_code, get_ordinal,
+    get_state_code,
+    get_ordinal,
 )
 import copy
 
 
 def add_additional_units(state, year, situation, taxsim_vars):
 
-    additional_tax_units_config = load_variable_mappings()["taxsim_to_policyengine"]["household_situation"]["additional_tax_units"]
-    additional_income_units_config = load_variable_mappings()["taxsim_to_policyengine"]["household_situation"]["additional_income_units"]
+    additional_tax_units_config = load_variable_mappings()["taxsim_to_policyengine"][
+        "household_situation"
+    ]["additional_tax_units"]
+    additional_income_units_config = load_variable_mappings()["taxsim_to_policyengine"][
+        "household_situation"
+    ]["additional_income_units"]
 
     tax_unit = situation["tax_units"]["your tax unit"]
     people_unit = situation["people"]
@@ -21,6 +26,10 @@ def add_additional_units(state, year, situation, taxsim_vars):
             if field == "state_use_tax":
                 if state.lower() in values:
                     tax_unit[f"{state}_use_tax"] = {str(year): 0}
+                continue
+
+            if field == "state_sales_tax":
+                tax_unit["state_sales_tax"] = {str(year): 0}
                 continue
 
             if len(values) > 1:
@@ -44,7 +53,9 @@ def add_additional_units(state, year, situation, taxsim_vars):
                 if "psemp" in taxsim_vars:
                     people_unit["you"][field] = {str(year): taxsim_vars.get("psemp", 0)}
                 if "your partner" in people_unit and "ssemp" in taxsim_vars:
-                    people_unit["your partner"][field] = {str(year): taxsim_vars.get("ssemp", 0)}
+                    people_unit["your partner"][field] = {
+                        str(year): taxsim_vars.get("ssemp", 0)
+                    }
 
             elif len(values) > 1:
                 matching_values = [
@@ -95,7 +106,7 @@ def form_household_situation(year, state, taxsim_vars):
             dep_name = f"your {get_ordinal(i)} dependent"
             household_situation["marital_units"][f"{dep_name}'s marital unit"] = {
                 "members": [dep_name],
-                "marital_unit_id": {str(year): i}
+                "marital_unit_id": {str(year): i},
             }
     else:
         household_situation["marital_units"]["your marital unit"]["members"] = (
@@ -108,23 +119,25 @@ def form_household_situation(year, state, taxsim_vars):
 
     people["you"] = {
         "age": {str(year): int(taxsim_vars.get("page", 40))},
-        "employment_income": {str(year): float(taxsim_vars.get("pwages", 0))}
+        "employment_income": {str(year): float(taxsim_vars.get("pwages", 0))},
     }
 
     if mstat == 2:
         people["your partner"] = {
             "age": {str(year): int(taxsim_vars.get("sage", 40))},
-            "employment_income": {str(year): float(taxsim_vars.get("swages", 0))}
+            "employment_income": {str(year): float(taxsim_vars.get("swages", 0))},
         }
 
     for i in range(1, depx + 1):
         dep_name = f"your {get_ordinal(i)} dependent"
         people[dep_name] = {
             "age": {str(year): int(taxsim_vars.get(f"age{i}", 10))},
-            "employment_income": {str(year): 0}
+            "employment_income": {str(year): 0},
         }
 
-    household_situation = add_additional_units(state.lower(), year, household_situation, taxsim_vars)
+    household_situation = add_additional_units(
+        state.lower(), year, household_situation, taxsim_vars
+    )
 
     return household_situation
 
@@ -151,7 +164,7 @@ def set_taxsim_defaults(taxsim_vars: dict) -> dict:
         "depx": 0,  # Number of dependents
         "mstat": 1,  # Marital status
         "taxsimid": 0,  # TAXSIM ID
-        "idtl": 0  # output flag
+        "idtl": 0,  # output flag
     }
 
     for key, default_value in DEFAULTS.items():
