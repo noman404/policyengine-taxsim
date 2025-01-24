@@ -22,6 +22,10 @@ def add_additional_units(state, year, situation, taxsim_vars):
                 if state.lower() in values:
                     tax_unit[f"{state}_use_tax"] = {str(year): 0}
                 continue
+                
+            if field == "state_sales_tax":
+                tax_unit["state_sales_tax"] = {str(year): 0}
+                continue
 
             if len(values) > 1:
                 matching_values = [
