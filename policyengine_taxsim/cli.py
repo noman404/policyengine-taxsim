@@ -41,7 +41,7 @@ def main(input_file, output, logs, disable_salt):
 
             taxsim_output = export_household(taxsim_input, pe_situation, logs, disable_salt)
 
-            idtl = taxsim_input['idtl']
+            idtl = taxsim_input["idtl"]
             if idtl == 0:
                 idtl_0_results.append(taxsim_output)
             elif idtl == 2:
@@ -71,9 +71,9 @@ def to_csv_str(results):
         return ""
 
     df = pd.DataFrame(results)
-    content = df.to_csv(index=False, float_format='%.1f', lineterminator='\n')
+    content = df.to_csv(index=False, float_format="%.1f", lineterminator="\n")
     cleaned_df = pd.read_csv(StringIO(content))
-    return cleaned_df.to_csv(index=False, lineterminator='\n')
+    return cleaned_df.to_csv(index=False, lineterminator="\n")
 
 
 if __name__ == "__main__":
