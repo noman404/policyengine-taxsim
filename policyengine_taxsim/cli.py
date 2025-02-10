@@ -21,7 +21,7 @@ except ImportError:
     help="Output file path",
 )
 @click.option('--logs', is_flag=True, help='Generate PE YAML Tests Logs')
-@click.option('--disable-salt', is_flag=True, default=False, help='Set Salt Deduction to 0.0')
+@click.option('--disable-salt', is_flag=True, default=False, help='Set SALT Deduction to 0')
 def main(input_file, output, logs, disable_salt):
     """
     Process TAXSIM input file and generate PolicyEngine-compatible output.
