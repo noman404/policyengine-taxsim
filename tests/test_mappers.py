@@ -139,7 +139,7 @@ def test_export_single_household(sample_taxsim_input):
     }
 
     result = export_household(
-        sample_taxsim_input, policyengine_single_household_situation, False
+        sample_taxsim_input, policyengine_single_household_situation, False, False
     )
     assert result["year"] == 2021
     assert result["state"] == 3
