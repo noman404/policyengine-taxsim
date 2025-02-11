@@ -365,9 +365,9 @@ def export_household(taxsim_input, policyengine_situation, logs, disable_salt):
 
     simulation = Simulation(situation=policyengine_situation)
 
-    # If salt should be disabled, set it once on the simulation instance with the required period
+    # If state and local taxes should be set to zero, set it once on the simulation instance with the required period
     if disable_salt:
-        simulation.set_input(variable_name="salt_deduction", value=0.0, period=year)
+        simulation.set_input(variable_name="state_and_local_sales_or_income_tax", value=0.0, period=year)
 
     taxsim_output = {}
     taxsim_output["taxsimid"] = policyengine_situation.get(
@@ -384,7 +384,7 @@ def export_household(taxsim_input, policyengine_situation, logs, disable_salt):
         a_dollar_more_situation = add_a_dollar(policyengine_situation)
         simulation_a_dollar_more = Simulation(situation=a_dollar_more_situation)
         if disable_salt:
-            simulation_a_dollar_more.set_input(variable_name="salt_deduction", value=0.0, period=year)
+            simulation_a_dollar_more.set_input(variable_name="state_and_local_sales_or_income_tax", value=0.0, period=year)
         output = generate_text_description_output(
             taxsim_input,
             mappings,
