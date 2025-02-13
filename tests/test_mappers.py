@@ -85,7 +85,13 @@ def test_import_single_household(sample_taxsim_input):
             "your household": {"members": ["you"], "state_name": {"2021": "AZ"}}
         },
         "marital_units": {"your marital unit": {"members": ["you"]}},
-        "people": {"you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}},
+        "people": {
+            "you": {
+                "age": {"2021": 35},
+                "employment_income": {"2021": 50000},
+                "is_tax_unit_head": {"2021": True},
+            }
+        },
         "spm_units": {"your household": {"members": ["you"]}},
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
@@ -101,7 +107,13 @@ def test_import_single_household_without_state(sample_taxsim_input_without_state
             "your household": {"members": ["you"], "state_name": {"2021": "TX"}}
         },
         "marital_units": {"your marital unit": {"members": ["you"]}},
-        "people": {"you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}},
+        "people": {
+            "you": {
+                "age": {"2021": 35},
+                "employment_income": {"2021": 50000},
+                "is_tax_unit_head": {"2021": True},
+            }
+        },
         "spm_units": {"your household": {"members": ["you"]}},
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
@@ -117,7 +129,13 @@ def test_import_single_household_with_state_eq_0(sample_taxsim_input_with_state_
             "your household": {"members": ["you"], "state_name": {"2021": "TX"}}
         },
         "marital_units": {"your marital unit": {"members": ["you"]}},
-        "people": {"you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}},
+        "people": {
+            "you": {
+                "age": {"2021": 35},
+                "employment_income": {"2021": 50000},
+                "is_tax_unit_head": {"2021": True},
+            }
+        },
         "spm_units": {"your household": {"members": ["you"]}},
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
@@ -133,7 +151,13 @@ def test_export_single_household(sample_taxsim_input):
             "your household": {"members": ["you"], "state_name": {"2021": "AZ"}}
         },
         "marital_units": {"your marital unit": {"members": ["you"]}},
-        "people": {"you": {"age": {"2021": 35}, "employment_income": {"2021": 50000}}},
+        "people": {
+            "you": {
+                "age": {"2021": 35},
+                "employment_income": {"2021": 50000},
+                "is_tax_unit_head": {"2021": True},
+            }
+        },
         "spm_units": {"your household": {"members": ["you"]}},
         "tax_units": {"your tax unit": {"members": ["you"]}},
     }
@@ -182,10 +206,15 @@ def test_joint_household(sample_taxsim_input_for_joint):
             },
         },
         "people": {
-            "you": {"age": {"2023": 40}, "employment_income": {"2023": 45000.0}},
+            "you": {
+                "age": {"2023": 40},
+                "employment_income": {"2023": 45000.0},
+                "is_tax_unit_head": {"2023": True},
+            },
             "your partner": {
                 "age": {"2023": 40},
                 "employment_income": {"2023": 30000.0},
+                "is_tax_unit_spouse": {"2023": True},
             },
             "your first dependent": {
                 "age": {"2023": 10},
@@ -257,8 +286,16 @@ def test_household_with_dependent(sample_taxsim_input_for_household_with_depende
             },
         },
         "people": {
-            "you": {"age": {"2023": 40}, "employment_income": {"2023": 81000.001}},
-            "your partner": {"age": {"2023": 40}, "employment_income": {"2023": 0.0}},
+            "you": {
+                "age": {"2023": 40},
+                "employment_income": {"2023": 81000.001},
+                "is_tax_unit_head": {"2023": True},
+            },
+            "your partner": {
+                "age": {"2023": 40},
+                "employment_income": {"2023": 0.0},
+                "is_tax_unit_spouse": {"2023": True},
+            },
             "your first dependent": {
                 "age": {"2023": 4},
                 "employment_income": {"2023": 0},
@@ -322,7 +359,11 @@ def test_household_with_dependent_single_parent(
             },
         },
         "people": {
-            "you": {"age": {"2023": 40}, "employment_income": {"2023": 81000.001}},
+            "you": {
+                "age": {"2023": 40},
+                "employment_income": {"2023": 81000.001},
+                "is_tax_unit_head": {"2023": True},
+            },
             "your first dependent": {
                 "age": {"2023": 4},
                 "employment_income": {"2023": 0},
