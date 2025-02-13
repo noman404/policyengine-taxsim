@@ -34,7 +34,10 @@ def get_yaml_path():
     help="Output file path",
 )
 @click.option("--logs", is_flag=True, help="Generate PE YAML Tests Logs")
-def main(input_file, output, logs):
+@click.option(
+    "--disable-salt", is_flag=True, default=False, help="Set SALT Deduction to 0"
+)
+def main(input_file, output, logs, disable_salt):
     """
     Process TAXSIM input file and generate PolicyEngine-compatible output.
     """
@@ -54,7 +57,9 @@ def main(input_file, output, logs):
             taxsim_input = row.to_dict()
             pe_situation = generate_household(taxsim_input)
 
-            taxsim_output = export_household(taxsim_input, pe_situation, logs)
+            taxsim_output = export_household(
+                taxsim_input, pe_situation, logs, disable_salt
+            )
 
             idtl = taxsim_input["idtl"]
             if idtl == 0:
